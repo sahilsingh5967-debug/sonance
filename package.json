@@ -1,0 +1,22 @@
+{
+  "name": "auralis",
+  "version": "1.0.0",
+  "description": "Luxury Hi-Fi Music Player & WebRTC Remote Party PWA",
+  "main": "js/main.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test/Auralis.test.js",
+    "start": "python3 -m http.server 8081"
+  },
+  "keywords": [
+    "music-player",
+    "pwa",
+    "webrtc",
+    "peerjs",
+    "web-audio-api",
+    "canvas-visualizer",
+    "event-bus"
+  ],
+  "author": "Shahil Raj",
+  "license": "MIT"
+}

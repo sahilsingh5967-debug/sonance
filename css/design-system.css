@@ -1,0 +1,47 @@
+/* ==========================================================================
+   SONANCE DESIGN SYSTEM - LUXURY INDIGO & ELECTRIC VIOLET PALETTE
+   ========================================================================== */
+
+:root {
+  /* Core Color Palette: Obsidian Abyss & Deep Indigo / Electric Violet */
+  --aur-abyss: #07070a;
+  --aur-chassis: #0d0d12;
+  --aur-deck: #12121a;
+  --aur-oled: #08080d;
+  
+  /* Brand Accent Tokens: Deep Indigo & Electric Violet */
+  --aur-indigo: #6366f1;
+  --aur-violet: #8b5cf6;
+  --aur-violet-glow: rgba(139, 92, 246, 0.25);
+  
+  /* Semantic Status Color: Connected Live Green */
+  --aur-live-green: #10b981;
+  --aur-live-glow: rgba(16, 185, 129, 0.3);
+
+  /* Materials & Glassmorphism */
+  --aur-glass-bg: rgba(18, 18, 26, 0.75);
+  --aur-glass-border: 1px solid rgba(139, 92, 246, 0.15);
+  --aur-border-subtle: 1px solid rgba(255, 255, 255, 0.07);
+
+  /* Typography Fonts */
+  --font-brand: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-oled: 'JetBrains Mono', monospace;
+
+  /* Text Colors */
+  --aur-text-main: #f3f4f6;
+  --aur-text-muted: #9ca3af;
+
+  /* Shadows & Radii */
+  --aur-shadow-deck: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.1);
+  --radius-chassis: 24px;
+  --radius-deck: 16px;
+  --radius-chip: 8px;
+
+  /* Spacing */
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+}

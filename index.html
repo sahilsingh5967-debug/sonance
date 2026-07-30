@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sonance - Luxury Hi-Fi Music Player & WebRTC Remote Party PWA.">
+  <meta name="theme-color" content="#07070a">
+
+  <title>SONANCE | Luxury Hi-Fi Acoustics & WebRTC Remote Party</title>
+
+  <!-- PWA Manifest & Favicon -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./assets/icons/icon.svg">
+
+  <!-- Google Fonts: Outfit, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/design-system.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+
+  <!-- jsmediatags CDN for ID3 Tag Ingestion -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+
+  <!-- ColorThief CDN for Dynamic Backdrop Extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+
+  <!-- PeerJS for WebRTC Remote Party Sync -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <!-- Hidden File Input for Data Ingestion -->
+  <input type="file" id="file-import" multiple accept="audio/*" style="display: none;">
+
+  <!-- Ambient & Dynamic Backdrop Overlay -->
+  <div id="dynamic-bg" class="aur-dynamic-bg"></div>
+  <div class="aur-ambient-glow" aria-hidden="true"></div>
+
+  <!-- Main App Wrapper -->
+  <div class="aur-app-wrapper">
+    
+    <main class="aur-chassis" role="region" aria-label="Sonance Audio Deck">
+      
+      <!-- Left Panel: Turntable & Master Volume -->
+      <section class="aur-turntable-deck">
+        <div id="vinyl-container" class="aur-vinyl-container">
+          <img id="vinyl-artwork" class="aur-vinyl-artwork" src="./assets/icons/icon.svg" alt="Album Artwork">
+        </div>
+
+        <div class="aur-knob-wrapper" style="width: 100%;">
+          <span class="aur-knob-label">Master Volume</span>
+          <input id="volume-knob" class="aur-knob-input" type="range" min="0" max="100" value="80" style="width: 80%;" aria-label="Master Volume">
+        </div>
+
+        <button id="btn-import-left" class="aur-import-btn" title="Import Audio Files (.mp3, .wav, .flac)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Import Music</span>
+        </button>
+      </section>
+
+      <!-- Right Panel: Controls, OLED Display, Waveform Scrubber & Subsystem Tabs -->
+      <section class="aur-control-deck">
+        
+        <!-- Header & Remote Party Badge -->
+        <header class="aur-header">
+          <div class="aur-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5v14M7 9v6M22 8v8M2 11v2"/>
+            </svg>
+            <span>SONANCE</span>
+          </div>
+
+          <button id="party-badge" class="aur-party-badge" title="Start or Join Remote Party">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Remote Party</span>
+          </button>
+        </header>
+
+        <!-- Smoked Glass OLED Screen Display -->
+        <section class="aur-oled-display">
+          <h1 id="track-title" class="aur-track-title">Sonance Hi-Fi Acoustics</h1>
+          <span id="track-artist" class="aur-track-artist">Sonance Demonstration</span>
+
+          <!-- Technical Audiophile Badges -->
+          <div class="aur-badge-row">
+            <span class="aur-badge">FLAC · 24-bit · 48kHz</span>
+            <span class="aur-badge">Web Audio 5-Band DSP</span>
+            <span id="badge-p2p" class="aur-badge">Standalone</span>
+          </div>
+
+          <!-- Interactive Waveform Scrubber Canvas (Replaces standard progress bar) -->
+          <div style="margin-top: 12px;">
+            <div class="aur-waveform-wrapper">
+              <canvas id="waveform-scrubber" class="aur-waveform-canvas"></canvas>
+            </div>
+            <div class="aur-oled-time">
+              <span id="current-time">00:00</span>
+              <span id="duration">00:00</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Subsystem Navigation Tabs (Queue, Files, Peers, EQ) -->
+        <nav class="aur-tabs-bar" role="tablist">
+          <button class="aur-tab-btn active" data-tab="tab-queue" role="tab">Queue (State)</button>
+          <button class="aur-tab-btn" data-tab="tab-files" role="tab">Files (Ingestion)</button>
+          <button class="aur-tab-btn" data-tab="tab-peers" role="tab">Peers (Network)</button>
+          <button class="aur-tab-btn" data-tab="tab-eq" role="tab">EQ (DSP)</button>
+        </nav>
+
+        <!-- Subsystem Tab Content Panels -->
+
+        <!-- Tab 1: Queue (State) - Active Default -->
+        <div id="tab-queue" class="aur-tab-content active" role="tabpanel">
+          <div id="library-container" class="aur-library-panel">
+            <!-- Dynamic Track Cards Rendered Here -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Files (Ingestion) -->
+        <div id="tab-files" class="aur-tab-content" role="tabpanel">
+          <div style="padding: 24px; background: rgba(255,255,255,0.02); border: var(--aur-glass-border); border-radius: var(--radius-deck); text-align: center;">
+            <p style="color: var(--aur-text-muted); font-size: 0.9rem; margin-bottom: 16px;">Drag and drop local MP3, WAV, or FLAC audio files anywhere on screen or click below to ingest into state queue.</p>
+            <button id="btn-import-tab" class="aur-import-btn" style="width: auto; margin: 0 auto; padding: 10px 24px;">
+              <span>Select Audio Files</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab 3: Peers (Network) -->
+        <div id="tab-peers" class="aur-tab-content" role="tabpanel">
+          <div style="padding: 20px; background: rgba(255,255,255,0.02); border: var(--aur-glass-border); border-radius: var(--radius-deck); display: flex; flex-direction: column; gap: 12px;">
+            <h3 style="font-family: var(--font-brand); color: #fff; font-size: 1rem;">Serverless WebRTC Remote Party</h3>
+            <p style="color: var(--aur-text-muted); font-size: 0.82rem;">Create a session as Host to stream local MP3 ArrayBuffer buffers to guests, or enter a Room ID to join as Guest.</p>
+            <div style="display: flex; gap: 12px;">
+              <button id="btn-party-host" class="aur-preset-chip" style="flex: 1;">Start Host Party</button>
+              <button id="btn-party-join" class="aur-preset-chip" style="flex: 1;">Join Guest Party</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: EQ (DSP) & Visualizer -->
+        <div id="tab-eq" class="aur-tab-content" role="tabpanel">
+          <div class="aur-visualizer-container">
+            <div class="aur-vis-modes">
+              <button class="aur-vis-btn active" data-vis-mode="spectrum">Spectrum</button>
+              <button class="aur-vis-btn" data-vis-mode="waveform">Waveform</button>
+              <button class="aur-vis-btn" data-vis-mode="circular">Circular</button>
+            </div>
+            <canvas id="visualizer-canvas"></canvas>
+          </div>
+
+          <div class="aur-eq-deck" style="flex-direction: column; align-items: stretch; gap: 12px;">
+            <div style="display: flex; justify-content: space-around; width: 100%;">
+              <div class="aur-knob-wrapper">
+                <span class="aur-knob-label">60Hz</span>
+                <input class="aur-knob-input" type="range" min="-12" max="12" value="0">
+              </div>
+              <div class="aur-knob-wrapper">
+                <span class="aur-knob-label">250Hz</span>
+                <input class="aur-knob-input" type="range" min="-12" max="12" value="0">
+              </div>
+              <div class="aur-knob-wrapper">
+                <span class="aur-knob-label">1kHz</span>
+                <input class="aur-knob-input" type="range" min="-12" max="12" value="0">
+              </div>
+              <div class="aur-knob-wrapper">
+                <span class="aur-knob-label">4kHz</span>
+                <input class="aur-knob-input" type="range" min="-12" max="12" value="0">
+              </div>
+              <div class="aur-knob-wrapper">
+                <span class="aur-knob-label">12kHz</span>
+                <input class="aur-knob-input" type="range" min="-12" max="12" value="0">
+              </div>
+            </div>
+
+            <div class="aur-preset-bar">
+              <button class="aur-preset-chip active" data-eq-preset="flat">Flat</button>
+              <button class="aur-preset-chip" data-eq-preset="rock">Rock</button>
+              <button class="aur-preset-chip" data-eq-preset="pop">Pop</button>
+              <button class="aur-preset-chip" data-eq-preset="jazz">Jazz</button>
+              <button class="aur-preset-chip" data-eq-preset="bass">Bass Boost</button>
+              <button class="aur-preset-chip" data-eq-preset="electronic">Electronic</button>
+              <button class="aur-preset-chip" data-eq-preset="speech">Speech</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport Controls -->
+        <section class="aur-controls">
+          <button id="btn-prev" class="aur-btn" title="Previous Track (Ctrl + Left)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="19 20 9 12 19 4 19 20"></polygon>
+              <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"></line>
+            </svg>
+          </button>
+
+          <button id="btn-play-pause" class="aur-btn aur-btn-primary" title="Play / Pause (Space)">
+            <svg id="icon-play" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg id="icon-pause" class="hidden" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </button>
+
+          <button id="btn-next" class="aur-btn" title="Next Track (Ctrl + Right)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
+            </svg>
+          </button>
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Command Palette Modal -->
+  <div id="command-palette" class="aur-palette-overlay" role="dialog" aria-modal="true">
+    <div class="aur-palette-card">
+      <input id="palette-input" class="aur-palette-input" type="text" placeholder="Type a command or search (e.g. Play, Preset, Visualizer)...">
+      <div class="aur-palette-list">
+        <div class="aur-palette-item" data-command="toggle-play">
+          <span>Toggle Play / Pause</span>
+          <span class="aur-palette-shortcut">Space</span>
+        </div>
+        <div class="aur-palette-item" data-command="next">
+          <span>Next Track</span>
+          <span class="aur-palette-shortcut">Ctrl + →</span>
+        </div>
+        <div class="aur-palette-item" data-command="prev">
+          <span>Previous Track</span>
+          <span class="aur-palette-shortcut">Ctrl + ←</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-notification" class="aur-toast" role="alert" aria-live="assertive">Sonance Initialized</div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#07080a"/>
+  <circle cx="256" cy="256" r="210" fill="#0f1117" stroke="#d4a359" stroke-width="8" stroke-opacity="0.4"/>
+  <!-- Vinyl Grooves -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#1c202c" stroke-width="6"/>
+  <circle cx="256" cy="256" r="110" fill="none" stroke="#151821" stroke-width="6"/>
+  <!-- Golden Hi-Fi Center Badge -->
+  <circle cx="256" cy="256" r="60" fill="#d4a359"/>
+  <polygon points="244,236 276,256 244,276" fill="#07080a"/>
+</svg>

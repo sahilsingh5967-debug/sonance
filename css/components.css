@@ -1,0 +1,370 @@
+/* ==========================================================================
+   SONANCE COMPONENTS - SUBSYSTEM TABS, TECHNICAL BADGES & OVERLAYS
+   ========================================================================== */
+
+/* Subsystem Navigation Tabs */
+.aur-tabs-bar {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: var(--aur-glass-border);
+  border-radius: var(--radius-chip);
+  padding: 4px;
+  gap: 4px;
+}
+
+.aur-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--aur-text-muted);
+  padding: 8px 12px;
+  font-family: var(--font-brand);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.aur-tab-btn:hover {
+  color: var(--aur-text-main);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.aur-tab-btn.active {
+  background: var(--aur-violet);
+  color: #ffffff;
+  box-shadow: 0 4px 14px var(--aur-violet-glow);
+}
+
+/* Subsystem Panel Containers */
+.aur-tab-content {
+  display: none;
+}
+
+.aur-tab-content.active {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+/* Library Panel & Internal Track Queue Scrolling Fix */
+.aur-library-panel {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 240px;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Technical Audiophile Badges */
+.aur-badge-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.aur-badge {
+  font-family: var(--font-oled);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--aur-text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.aur-badge-live {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--aur-live-green);
+  color: var(--aur-live-green);
+  box-shadow: 0 0 10px var(--aur-live-glow);
+}
+
+/* Waveform Scrubber Canvas */
+.aur-waveform-wrapper {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.aur-waveform-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Smoked Glass OLED Screen */
+.aur-oled-display {
+  background: var(--aur-oled);
+  border: var(--aur-glass-border);
+  border-radius: var(--radius-deck);
+  padding: var(--space-20);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.aur-track-title {
+  font-family: var(--font-brand);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.aur-track-artist {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--aur-violet);
+}
+
+.aur-oled-time {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-oled);
+  font-size: 0.8rem;
+  color: var(--aur-text-muted);
+  margin-top: 8px;
+}
+
+/* Equalizer Presets & Chips */
+.aur-preset-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--aur-text-muted);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: var(--font-brand);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aur-preset-chip.active, .aur-preset-chip:hover {
+  background: var(--aur-indigo);
+  color: #ffffff;
+  border-color: var(--aur-indigo);
+}
+
+/* Remote Party Status Badge */
+.aur-party-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--aur-text-main);
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-brand);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 100%;
+}
+
+.aur-party-badge.connected {
+  border-color: var(--aur-live-green);
+  color: var(--aur-live-green);
+  box-shadow: 0 0 12px var(--aur-live-glow);
+}
+
+/* Track Cards in Queue */
+.aur-track-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aur-track-card:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.aur-track-card.active {
+  background: rgba(139, 92, 246, 0.18);
+  border-color: var(--aur-violet);
+}
+
+.aur-track-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.aur-fallback-art {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--aur-indigo), var(--aur-violet));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.aur-track-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.aur-track-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--aur-text-main);
+}
+
+.aur-track-artist-sub {
+  font-size: 0.75rem;
+  color: var(--aur-text-muted);
+}
+
+/* ==========================================================================
+   FIXED OVERLAYS: COMMAND PALETTE & TOAST NOTIFICATION
+   ========================================================================== */
+
+/* Command Palette Modal Overlay */
+.aur-palette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(7, 7, 10, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.aur-palette-overlay.open {
+  display: flex !important;
+}
+
+.aur-palette-card {
+  background: #12121a;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 520px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--aur-violet-glow);
+  animation: paletteScale 0.2s ease forwards;
+}
+
+@keyframes paletteScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.aur-palette-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-family: var(--font-brand);
+  font-size: 0.95rem;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.aur-palette-input:focus {
+  border-color: var(--aur-violet);
+}
+
+.aur-palette-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.aur-palette-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--aur-text-main);
+  font-family: var(--font-brand);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aur-palette-item:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--aur-violet);
+}
+
+.aur-palette-shortcut {
+  font-family: var(--font-oled);
+  font-size: 0.75rem;
+  color: var(--aur-text-muted);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Toast Notification Overlay */
+.aur-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #12121a;
+  border: 1px solid var(--aur-violet);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--aur-violet-glow);
+  color: var(--aur-text-main);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-family: var(--font-brand);
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aur-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}

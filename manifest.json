@@ -1,0 +1,18 @@
+{
+  "name": "Sonance | Luxury Hi-Fi Music Player & WebRTC Remote Party",
+  "short_name": "Sonance",
+  "description": "Luxury Bang & Olufsen acoustics emulation with 5-band EQ, 60FPS visualizer, and PeerJS Remote Party sync.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B0B0B",
+  "theme_color": "#0B0B0B",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./assets/icons/icon.svg",
+      "sizes": "512x512 192x192 128x128 64x64",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

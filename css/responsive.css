@@ -1,0 +1,100 @@
+/* ==========================================================================
+   SONANCE RESPONSIVE BREAKPOINTS
+   Mobile & Tablet Adapters for iOS / Android & Small Screens
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  body {
+    padding: var(--space-12);
+  }
+
+  .aur-chassis {
+    grid-template-columns: 1fr;
+    padding: var(--space-20);
+    gap: var(--space-20);
+  }
+
+  .aur-turntable-deck {
+    width: 100%;
+  }
+
+  .aur-vinyl-container {
+    width: 220px;
+    height: 220px;
+  }
+
+  .aur-vinyl-artwork {
+    width: 100px;
+    height: 100px;
+  }
+
+  .aur-eq-deck {
+    flex-wrap: wrap;
+    gap: var(--space-16);
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 8px;
+  }
+
+  .aur-chassis {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .aur-vinyl-container {
+    width: 180px;
+    height: 180px;
+  }
+
+  .aur-vinyl-artwork {
+    width: 80px;
+    height: 80px;
+  }
+
+  .aur-tabs-bar {
+    flex-wrap: wrap;
+  }
+
+  .aur-tab-btn {
+    flex: 1 1 45%;
+    font-size: 0.78rem;
+    padding: 6px 8px;
+  }
+
+  .aur-track-title {
+    font-size: 1.15rem;
+  }
+
+  .aur-badge-row {
+    gap: 4px;
+  }
+
+  .aur-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
+  .aur-controls {
+    justify-content: space-around;
+  }
+
+  .aur-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .aur-btn-primary {
+    width: 54px;
+    height: 54px;
+  }
+
+  .aur-toast {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    font-size: 0.8rem;
+  }
+}
