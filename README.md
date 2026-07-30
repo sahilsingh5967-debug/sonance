@@ -1,29 +1,28 @@
-# 🎵 SONANCE — Luxury Hi-Fi Music Player & WebRTC Remote Party PWA
+# 🎵 Sonance — Hi-Fi Music Player & WebRTC Remote Party
 
-[![Sonance CI Pipeline](https://github.com/shahilraj/MusicPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/shahilraj/MusicPlayer/actions/workflows/ci.yml)
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployment%20Ready-000000?logo=vercel&logoColor=white)](https://vercel.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI Pipeline](https://github.com/sahilsingh5967-debug/sonance/actions/workflows/ci.yml/badge.svg)](https://github.com/sahilsingh5967-debug/sonance/actions/workflows/ci.yml)
+[![Vercel](https://img.shields.io/badge/Vercel-Live-000000?logo=vercel&logoColor=white)](https://vercel.com)
 
-> **A recruiter-grade, high-performance Progressive Web Application built with pure Vanilla JS (ES6), Web Audio API 5-Band DSP, Web Workers, Canvas Visualizers, and Serverless WebRTC PeerJS Audio Streaming.**
+> A high-performance Progressive Web Application built with **pure Vanilla JS (ES6 Modules)**, Web Audio API 5-Band DSP, Web Workers, Canvas Visualizers, and serverless WebRTC P2P audio streaming — zero frameworks, zero dependencies on runtime libraries.
 
-![Sonance Cover](./assets/icons/icon.svg)
-
----
-
-## 🌟 Key Features
-
-- **⚡ Zero Framework Architecture**: Built strictly with ES6 JavaScript Modules and a custom Pub/Sub `EventBus` design pattern for decoupled event management.
-- **🎛️ Web Audio API 5-Band Equalizer DSP**: Real-time parametric BiquadFilter equalizer (`60Hz`, `250Hz`, `1kHz`, `4kHz`, `12kHz`) with instant presets (`Bass Boost`, `Rock`, `Pop`, `Jazz`, `Electronic`, `Speech`).
-- **📊 60FPS Canvas Visualizer Deck**: Real-time spectrum analysis, oscilloscope waveform rendering, and circular radial visualizer driven by `AnalyserNode` and `requestAnimationFrame`.
-- **📈 SoundCloud-Style Waveform Scrubber**: Asynchronous background peak extraction powered by a **Web Worker** and **Transferable Objects**, rendering interactive peak canvases without main thread UI freezing.
-- **🌐 Serverless WebRTC Remote Party**: P2P state synchronization and raw `ArrayBuffer` MP3 audio file streaming across host and guest sessions using WebRTC and PeerJS.
-- **📱 Progressive Web Application (PWA)**: Complete offline caching strategy via Service Worker (`sw.js`) and web app installation manifest (`manifest.json`).
-- **🎨 Dynamic Palette Extraction**: Adaptive background aura dynamically extracted from album cover art using `ColorThief`.
-- **🔒 macOS & Safari Compatibility**: Automatic Web Audio Context unblocking on physical user interaction, robust gain ramping anchors, and CORS-safe blob handling.
+![Sonance UI](./assets/sonance-preview.png)
 
 ---
 
-## 🔊 Audio Routing Architecture
+## ✨ Features
+
+- **⚡ Zero Framework Architecture** — ES6 modules with a custom Pub/Sub `EventBus` for fully decoupled event management
+- **🎛️ 5-Band Web Audio EQ** — Real-time BiquadFilter DSP at `60Hz · 250Hz · 1kHz · 4kHz · 12kHz` with instant presets: Bass Boost, Rock, Pop, Jazz, Electronic, Speech
+- **📊 60FPS Canvas Visualizer** — Spectrum analyser, oscilloscope waveform, and circular radial mode via `AnalyserNode` + `requestAnimationFrame`
+- **📈 Waveform Scrubber** — Asynchronous background peak extraction via Web Worker and `Float32Array` Transferable Objects — no main thread blocking
+- **🌐 WebRTC Remote Party** — P2P state sync and raw `ArrayBuffer` audio file streaming across host and guest sessions via PeerJS
+- **📱 Progressive Web App** — Full offline support via versioned Service Worker (`sw.js`) and `manifest.json`
+- **🎨 Dynamic Aura** — Adaptive background colour extracted from album art using ColorThief
+- **🔒 Safari / macOS Compatible** — Automatic `AudioContext` unblocking on user interaction, gain ramping, and CORS-safe blob handling
+
+---
+
+## 🖥️ Audio Routing Architecture
 
 ```
 [ HTMLAudioElement ]
@@ -32,68 +31,75 @@
 [ MediaElementAudioSourceNode ]
         │
         ▼
-[ GainNode (Volume Ramping & Mute) ]
+[ GainNode  ←  Volume Ramping & Mute ]
         │
         ▼
-[ 5x BiquadFilterNodes ] (60Hz -> 250Hz -> 1kHz -> 4kHz -> 12kHz)
+[ BiquadFilterNode  60 Hz  ]
+[ BiquadFilterNode  250 Hz ]
+[ BiquadFilterNode  1 kHz  ]
+[ BiquadFilterNode  4 kHz  ]
+[ BiquadFilterNode  12 kHz ]
         │
         ▼
-[ AnalyserNode (FFT Size: 256) ]
+[ AnalyserNode  ←  FFT Size 256 ]
         │
         ▼
-[ AudioContext.destination ] (Physical Speakers)
+[ AudioContext.destination  →  🔊 Speakers ]
 ```
 
 ---
 
-## ⚙️ Continuous Integration (CI) Workflow
+## ⚙️ CI / CD Pipeline
 
-Sonance features a GitHub Actions Continuous Integration pipeline (`.github/workflows/ci.yml`) that automatically triggers on every `push` and `pull_request` to the `main` or `master` branches:
+GitHub Actions runs automatically on every push and pull request to `main`:
 
-1. **Repository Checkout**: Pulls codebase via `actions/checkout@v4`.
-2. **Node.js Environment Setup**: Initializes Node.js 20 environment with npm caching.
-3. **Dependency Installation**: Runs `npm install`.
-4. **Code Quality Linting**: Executes `npm run lint` (ESLint) for code standard compliance.
-5. **Automated Unit Testing**: Executes `npm test` across all ES6 unit test suites (`eventBus.test.js`, `playlist.test.js`, `audioEngine.test.js`, `partySync.test.js`).
-6. **Pipeline Fail-Fast Guard**: Automatically blocks code merges if any linting rule or unit test fails.
+| Step | Action |
+|---|---|
+| 1 | Repository checkout via `actions/checkout@v4` |
+| 2 | Node.js 22 setup with npm cache |
+| 3 | `npm install` |
+| 4 | `npm run lint` — ESLint + Prettier code quality check |
+| 5 | `npm test` — unit tests for `eventBus`, `playlist`, `audioEngine`, `partySync` |
+| 6 | Fail-fast guard — blocks merges on any lint or test failure |
 
----
-
-## 🛠️ Technology Stack
-
-- **Core Engine**: HTML5, Vanilla CSS3 (Custom Design System), ES6 JavaScript Modules
-- **Audio Processing**: Web Audio API (`AudioContext`, `BiquadFilterNode`, `GainNode`, `AnalyserNode`)
-- **Multithreading**: Web Workers API (`waveformWorker.js` with `Float32Array` Transferable Objects)
-- **Visuals**: HTML5 Canvas 2D API & ColorThief
-- **P2P Networking**: WebRTC API & PeerJS
-- **Progressive Web App**: Service Workers & Cache API
-- **Continuous Integration**: GitHub Actions & ESLint
+Vercel deploys automatically on every successful merge to `main`.
 
 ---
 
-## 🚀 How to Run Locally
+## 🛠️ Tech Stack
 
-Because Sonance uses ES6 JavaScript modules, Web Workers, and Service Workers, it requires a local HTTP server to bypass browser CORS security policies.
+| Layer | Technology |
+|---|---|
+| Core | HTML5, CSS3 Custom Design System, ES6 Modules |
+| Audio | Web Audio API (`AudioContext`, `BiquadFilterNode`, `GainNode`, `AnalyserNode`) |
+| Threading | Web Workers API (`waveformWorker.js`, `Float32Array` Transferable Objects) |
+| Visuals | HTML5 Canvas 2D API, ColorThief |
+| Networking | WebRTC API, PeerJS |
+| PWA | Service Worker, Cache API |
+| Tooling | GitHub Actions, ESLint, Prettier |
 
-### Option 1: Python HTTP Server (Built-in)
+---
+
+## 🚀 Running Locally
+
+ES6 modules, Web Workers, and Service Workers require an HTTP server — opening `index.html` directly via `file://` will not work.
+
+**Option 1 — Python (built-in):**
 ```bash
-# Navigate to the project root
-cd /path/to/MusicPlayer
-
-# Launch Python 3 local server
+cd sonance
 python3 -m http.server 8000
 ```
-Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in Google Chrome, Safari, or Microsoft Edge.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in Chrome, Safari, or Edge.
 
-### Option 2: VS Code Live Server
-1. Install the **Live Server** extension in VS Code.
-2. Right-click `index.html` and select **Open with Live Server**.
+**Option 2 — VS Code Live Server:**
+1. Install the **Live Server** extension
+2. Right-click `index.html` → **Open with Live Server**
 
 ---
 
-## 🌐 Deploying to Vercel
+## ☁️ Deploying to Vercel
 
-Sonance is pre-configured for instant Vercel deployment with clean URLs and immutable static asset headers via `vercel.json`:
+Pre-configured with `vercel.json` for clean URLs and immutable static asset caching:
 
 ```bash
 npm i -g vercel
@@ -102,8 +108,7 @@ vercel --prod
 
 ---
 
-## 👨‍💻 Developer & Project Credits
+## 👨‍💻 Developer
 
-- **Developer**: [Shahil Raj](https://github.com/shahilraj)
-- **Organization**: CodeAlpha Frontend Development Internship
-- **License**: MIT
+Built by **Sahil Singh** ([@sahilsingh5967-debug](https://github.com/sahilsingh5967-debug))
+as part of the **CodeAlpha Frontend Development Internship**.
