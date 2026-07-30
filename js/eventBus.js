@@ -1,5 +1,5 @@
 /**
- * Auralis EventBus - Pub/Sub Event Manager
+ * Sonance EventBus - Pub/Sub Event Manager
  * Central nervous system decoupling UI, Audio Engine, Visualizer, WebRTC & Storage.
  */
 export class EventBus {

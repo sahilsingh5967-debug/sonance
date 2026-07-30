@@ -1,44 +1,250 @@
 /* ==========================================================================
-   SONANCE DESIGN SYSTEM - LUXURY INDIGO & ELECTRIC VIOLET PALETTE
+   SONANCE COMPREHENSIVE THEME ARCHITECTURE
+   Fully Isolated Theme Scopes: Aurora (Night), Opus (Signature), Obsidian (Studio)
    ========================================================================== */
 
-:root {
-  /* Core Color Palette: Obsidian Abyss & Deep Indigo / Electric Violet */
-  --aur-abyss: #07070a;
-  --aur-chassis: #0d0d12;
-  --aur-deck: #12121a;
-  --aur-oled: #08080d;
+/* ----------------------------------------------------
+   1. AURORA (Night Edition) - Original Dark Neon (SOURCE OF TRUTH)
+   ---------------------------------------------------- */
+:root, [data-theme="aurora"] {
+  /* Surfaces & Backgrounds */
+  --aur-abyss: #07070A;
+  --aur-chassis: #0D0D12;
+  --aur-deck: #12121A;
+  --aur-oled: #08080D;
+  --aur-body-bg: radial-gradient(circle at 50% 0%, var(--dynamic-glow, rgba(139, 92, 246, 0.12)) 0%, #07070A 60%);
+  --aur-ambient-bg: radial-gradient(circle, var(--dynamic-glow, rgba(139, 92, 246, 0.08)) 0%, rgba(99, 102, 241, 0.03) 45%, transparent 70%);
   
-  /* Brand Accent Tokens: Deep Indigo & Electric Violet */
-  --aur-indigo: #6366f1;
-  --aur-violet: #8b5cf6;
+  /* Brand Accents */
+  --aur-gold-accent: #8B5CF6;
+  --aur-gold-hover: #A78BFA;
+  --aur-gold-light: #C4B5FD;
+  --aur-gold-dark: #6366F1;
+  --aur-gold-glow: rgba(139, 92, 246, 0.25);
+  
+  --aur-indigo: #6366F1;
+  --aur-violet: #8B5CF6;
   --aur-violet-glow: rgba(139, 92, 246, 0.25);
-  
-  /* Semantic Status Color: Connected Live Green */
-  --aur-live-green: #10b981;
-  --aur-live-glow: rgba(16, 185, 129, 0.3);
+  --aur-bronze: #8B5CF6;
 
-  /* Materials & Glassmorphism */
-  --aur-glass-bg: rgba(18, 18, 26, 0.75);
-  --aur-glass-border: 1px solid rgba(139, 92, 246, 0.15);
+  /* Status Colors */
+  --aur-live-green: #10B981;
+  --aur-live-glow: rgba(16, 185, 129, 0.30);
+  --aur-danger: #EF4444;
+
+  /* Material Borders & Glass */
+  --aur-border-panel: 1px solid rgba(255, 255, 255, 0.07);
   --aur-border-subtle: 1px solid rgba(255, 255, 255, 0.07);
+  --aur-glass-border: 1px solid rgba(139, 92, 246, 0.15);
+  --aur-glass-bg: rgba(18, 18, 26, 0.75);
 
-  /* Typography Fonts */
+  /* Typography Colors */
+  --aur-text-main: #F3F4F6;
+  --aur-text-muted: #9CA3AF;
+  --aur-text-subtle: #6B7280;
+
+  /* Shadows */
+  --aur-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.70);
+  --aur-shadow-deck: 0 20px 50px rgba(0, 0, 0, 0.80), 0 0 40px rgba(99, 102, 241, 0.10);
+
+  /* Buttons & Transport */
+  --btn-primary-bg: radial-gradient(circle at 30% 30%, #A78BFA 0%, #8B5CF6 70%, #6366F1 100%);
+  --btn-primary-border: 2px solid #C4B5FD;
+  --btn-standard-bg: rgba(255, 255, 255, 0.04);
+  --btn-standard-hover: rgba(139, 92, 246, 0.15);
+  --btn-standard-border: 1px solid rgba(255, 255, 255, 0.10);
+
+  /* Queue Cards */
+  --card-bg-normal: rgba(255, 255, 255, 0.02);
+  --card-bg-hover: rgba(139, 92, 246, 0.10);
+  --card-bg-active: rgba(139, 92, 246, 0.18);
+  --card-border-active: #8B5CF6;
+
+  /* Waveform Scrubber */
+  --wave-bg: rgba(0, 0, 0, 0.40);
+  --wave-border: 1px solid rgba(139, 92, 246, 0.20);
+  --wave-played-start: #A78BFA;
+  --wave-played-end: #6366F1;
+  --wave-unplayed: #262626;
+
+  /* Modal Overlay */
+  --overlay-bg: rgba(7, 7, 10, 0.85);
+  --modal-card-bg: #12121A;
+  --modal-card-border: 1px solid rgba(139, 92, 246, 0.30);
+  --modal-card-shadow: 0 20px 50px rgba(0, 0, 0, 0.80), 0 0 30px rgba(139, 92, 246, 0.25);
+  --modal-input-bg: rgba(255, 255, 255, 0.05);
+
+  /* Scrollbars */
+  --scrollbar-track: #12121A;
+  --scrollbar-thumb: #8B5CF6;
+}
+
+/* ----------------------------------------------------
+   2. OPUS (Signature Edition) - Ivory & Champagne Gold Luxury Hi-Fi
+   ---------------------------------------------------- */
+[data-theme="opus"] {
+  /* Surfaces & Backgrounds */
+  --aur-abyss: #F8F7F3;
+  --aur-chassis: #FFFFFF;
+  --aur-deck: #F3F1EB;
+  --aur-oled: #FFFFFF;
+  --aur-body-bg: radial-gradient(circle at 50% 0%, var(--dynamic-glow, rgba(196, 154, 39, 0.08)) 0%, #F8F7F3 70%);
+  --aur-ambient-bg: radial-gradient(circle, var(--dynamic-glow, rgba(196, 154, 39, 0.06)) 0%, rgba(232, 210, 139, 0.03) 45%, transparent 70%);
+  
+  /* Brand Accents */
+  --aur-gold-accent: #C49A27;
+  --aur-gold-hover: #D6AE45;
+  --aur-gold-light: #E8D28B;
+  --aur-gold-dark: #9E7820;
+  --aur-gold-glow: rgba(196, 154, 39, 0.18);
+  
+  --aur-indigo: #C49A27;
+  --aur-violet: #C49A27;
+  --aur-violet-glow: rgba(196, 154, 39, 0.18);
+  --aur-bronze: #C49A27;
+
+  /* Status Colors */
+  --aur-live-green: #3D9461;
+  --aur-live-glow: rgba(61, 148, 97, 0.20);
+  --aur-danger: #C14B4B;
+
+  /* Material Borders & Glass */
+  --aur-border-panel: 1px solid #D7D2C7;
+  --aur-border-subtle: 1px solid #E3DFD5;
+  --aur-glass-border: 1px solid #D7D2C7;
+  --aur-glass-bg: rgba(255, 255, 255, 0.90);
+
+  /* Typography Colors */
+  --aur-text-main: #2B2B2B;
+  --aur-text-muted: #666666;
+  --aur-text-subtle: #8A8A8A;
+
+  /* Shadows */
+  --aur-shadow-soft: 0 2px 6px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.06);
+  --aur-shadow-deck: 0 4px 12px rgba(0, 0, 0, 0.05), 0 16px 40px rgba(196, 154, 39, 0.08);
+
+  /* Buttons & Transport */
+  --btn-primary-bg: radial-gradient(circle at 30% 30%, #D6AE45 0%, #C49A27 70%, #9E7820 100%);
+  --btn-primary-border: 2px solid #E8D28B;
+  --btn-standard-bg: #FFFFFF;
+  --btn-standard-hover: #F8F7F3;
+  --btn-standard-border: 1px solid #D7D2C7;
+
+  /* Queue Cards */
+  --card-bg-normal: #FFFFFF;
+  --card-bg-hover: #F8F7F3;
+  --card-bg-active: rgba(196, 154, 39, 0.08);
+  --card-border-active: #C49A27;
+
+  /* Waveform Scrubber */
+  --wave-bg: #F3F1EB;
+  --wave-border: 1px solid #D7D2C7;
+  --wave-played-start: #D6AE45;
+  --wave-played-end: #C49A27;
+  --wave-unplayed: #D7D2C7;
+
+  /* Modal Overlay */
+  --overlay-bg: rgba(43, 43, 43, 0.40);
+  --modal-card-bg: #FFFFFF;
+  --modal-card-border: 1px solid #D7D2C7;
+  --modal-card-shadow: 0 2px 6px rgba(0,0,0,0.04), 0 10px 30px rgba(0,0,0,0.08);
+  --modal-input-bg: #F3F1EB;
+
+  /* Scrollbars */
+  --scrollbar-track: #F3F1EB;
+  --scrollbar-thumb: #C49A27;
+}
+
+/* ----------------------------------------------------
+   3. OBSIDIAN (Studio Edition) - Dark Stealth Metal & Precision Metering
+   ---------------------------------------------------- */
+[data-theme="obsidian"] {
+  /* Surfaces & Backgrounds */
+  --aur-abyss: #0B0C0E;
+  --aur-chassis: #121316;
+  --aur-deck: #18191E;
+  --aur-oled: #0D0E11;
+  --aur-body-bg: radial-gradient(circle at 50% 0%, var(--dynamic-glow, rgba(56, 189, 248, 0.12)) 0%, #0B0C0E 60%);
+  --aur-ambient-bg: radial-gradient(circle, var(--dynamic-glow, rgba(56, 189, 248, 0.08)) 0%, rgba(2, 132, 199, 0.03) 45%, transparent 70%);
+  
+  /* Brand Accents */
+  --aur-gold-accent: #38BDF8;
+  --aur-gold-hover: #7DD3FC;
+  --aur-gold-light: #BAE6FD;
+  --aur-gold-dark: #0284C7;
+  --aur-gold-glow: rgba(56, 189, 248, 0.25);
+  
+  --aur-indigo: #38BDF8;
+  --aur-violet: #38BDF8;
+  --aur-violet-glow: rgba(56, 189, 248, 0.25);
+  --aur-bronze: #38BDF8;
+
+  /* Status Colors */
+  --aur-live-green: #F59E0B;
+  --aur-live-glow: rgba(245, 158, 11, 0.30);
+  --aur-danger: #F43F5E;
+
+  /* Material Borders & Glass */
+  --aur-border-panel: 1px solid rgba(56, 189, 248, 0.20);
+  --aur-border-subtle: 1px solid rgba(255, 255, 255, 0.09);
+  --aur-glass-border: 1px solid rgba(56, 189, 248, 0.20);
+  --aur-glass-bg: rgba(24, 25, 30, 0.85);
+
+  /* Typography Colors */
+  --aur-text-main: #E2E8F0;
+  --aur-text-muted: #94A3B8;
+  --aur-text-subtle: #64748B;
+
+  /* Shadows */
+  --aur-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.80);
+  --aur-shadow-deck: 0 20px 50px rgba(0, 0, 0, 0.90), 0 0 40px rgba(56, 189, 248, 0.15);
+
+  /* Buttons & Transport */
+  --btn-primary-bg: radial-gradient(circle at 30% 30%, #7DD3FC 0%, #38BDF8 70%, #0284C7 100%);
+  --btn-primary-border: 2px solid #BAE6FD;
+  --btn-standard-bg: rgba(255, 255, 255, 0.04);
+  --btn-standard-hover: rgba(56, 189, 248, 0.15);
+  --btn-standard-border: 1px solid rgba(56, 189, 248, 0.25);
+
+  /* Queue Cards */
+  --card-bg-normal: rgba(255, 255, 255, 0.02);
+  --card-bg-hover: rgba(56, 189, 248, 0.10);
+  --card-bg-active: rgba(56, 189, 248, 0.18);
+  --card-border-active: #38BDF8;
+
+  /* Waveform Scrubber */
+  --wave-bg: rgba(13, 14, 17, 0.60);
+  --wave-border: 1px solid rgba(56, 189, 248, 0.20);
+  --wave-played-start: #7DD3FC;
+  --wave-played-end: #0284C7;
+  --wave-unplayed: #21262D;
+
+  /* Modal Overlay */
+  --overlay-bg: rgba(11, 12, 14, 0.85);
+  --modal-card-bg: #18191E;
+  --modal-card-border: 1px solid rgba(56, 189, 248, 0.30);
+  --modal-card-shadow: 0 20px 50px rgba(0, 0, 0, 0.90), 0 0 30px rgba(56, 189, 248, 0.20);
+  --modal-input-bg: rgba(255, 255, 255, 0.05);
+
+  /* Scrollbars */
+  --scrollbar-track: #18191E;
+  --scrollbar-thumb: #38BDF8;
+}
+
+/* Common Universal Non-Color Tokens Only */
+:root {
   --font-brand: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-oled: 'JetBrains Mono', monospace;
 
-  /* Text Colors */
-  --aur-text-main: #f3f4f6;
-  --aur-text-muted: #9ca3af;
-
-  /* Shadows & Radii */
-  --aur-shadow-deck: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.1);
   --radius-chassis: 24px;
-  --radius-deck: 16px;
-  --radius-chip: 8px;
+  --radius-card: 18px;
+  --radius-deck: 18px;
+  --radius-button: 14px;
+  --radius-input: 12px;
+  --radius-chip: 12px;
+  --radius-badge: 999px;
 
-  /* Spacing */
   --space-8: 8px;
   --space-12: 12px;
   --space-16: 16px;

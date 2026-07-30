@@ -1,9 +1,10 @@
 /**
  * Sonance Storage - LocalStorage Data Persistence Engine
  * 
- * Saves & restores user audio state across sessions:
+ * Saves & restores user audio state and theme settings across sessions:
  * - VOLUME_UPDATED -> localStorage.setItem('sonance_volume', value)
  * - EQ_UPDATED -> localStorage.setItem('sonance_eq', gainsArray)
+ * - THEME_CHANGED -> localStorage.setItem('sonance_theme', themeName)
  * - Restores state on application boot before playback starts.
  */
 export class Storage {
@@ -19,6 +20,7 @@ export class Storage {
   bindEvents() {
     this.eventBus.on('VOLUME_UPDATED', (vol) => this.save('sonance_volume', vol));
     this.eventBus.on('EQ_UPDATED', (gainsArray) => this.save('sonance_eq', gainsArray));
+    this.eventBus.on('THEME_CHANGED', (theme) => this.save('sonance_theme', theme));
   }
 
   /**
@@ -39,6 +41,14 @@ export class Storage {
    */
   restoreState() {
     try {
+      const savedTheme = localStorage.getItem('sonance_theme');
+      if (savedTheme !== null) {
+        const theme = JSON.parse(savedTheme);
+        setTimeout(() => {
+          this.eventBus.emit('THEME_RESTORED', theme);
+        }, 100);
+      }
+
       const savedVol = localStorage.getItem('sonance_volume');
       if (savedVol !== null) {
         const volume = JSON.parse(savedVol);

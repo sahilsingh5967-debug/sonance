@@ -1,6 +1,5 @@
 /* ==========================================================================
-   SONANCE LAYOUT ENGINE
-   B&O Hi-Fi Brushed Metal Chassis, Turntable Area & Dynamic Theme Backdrop
+   SONANCE FULLY ISOLATED MULTI-THEME LAYOUT ENGINE
    ========================================================================== */
 
 *, *::before, *::after {
@@ -12,13 +11,13 @@
 
 /* Accessibility Focus-Visible Outline */
 button:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--aur-bronze) !important;
+  outline: 2px solid var(--aur-gold-accent) !important;
   outline-offset: 2px !important;
 }
 
 body {
   font-family: var(--font-body);
-  background: radial-gradient(circle at 50% 0%, var(--dynamic-glow, rgba(212, 163, 89, 0.10)) 0%, #0B0B0B 60%);
+  background: var(--aur-body-bg);
   background-color: var(--aur-abyss);
   color: var(--aur-text-main);
   min-height: 100vh;
@@ -28,12 +27,12 @@ body {
   padding: var(--space-24);
   overflow-x: hidden;
   opacity: 0;
-  animation: fadeInApp 600ms ease forwards;
-  transition: background 1s ease-in-out;
+  animation: fadeInApp 400ms ease-out forwards;
+  transition: background 300ms ease-in-out, color 300ms ease-in-out;
 }
 
 @keyframes fadeInApp {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -45,7 +44,7 @@ body {
   transform: translate(-50%, -50%);
   width: 850px;
   height: 850px;
-  background: radial-gradient(circle, var(--dynamic-glow, rgba(212, 163, 89, 0.08)) 0%, rgba(56, 189, 248, 0.03) 45%, transparent 70%);
+  background: var(--aur-ambient-bg);
   pointer-events: none;
   z-index: 0;
   filter: blur(80px);
@@ -63,7 +62,7 @@ body {
 /* Hi-Fi Chassis Container */
 .aur-chassis {
   background-color: var(--aur-chassis);
-  border: var(--aur-border-subtle);
+  border: var(--aur-border-panel);
   border-radius: var(--radius-chassis);
   box-shadow: var(--aur-shadow-deck);
   padding: var(--space-32);
@@ -72,19 +71,22 @@ body {
   gap: var(--space-32);
   position: relative;
   overflow: hidden;
+  transition: background-color 300ms ease-in-out, border-color 300ms ease-in-out;
 }
 
 /* Left Panel: Turntable / Album Deck */
 .aur-turntable-deck {
   background-color: var(--aur-deck);
-  border: var(--aur-glass-border);
-  border-radius: var(--radius-deck);
+  border: var(--aur-border-panel);
+  border-radius: var(--radius-card);
   padding: var(--space-24);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-24);
   position: relative;
+  box-shadow: var(--aur-shadow-soft);
+  transition: background-color 300ms ease-in-out, border-color 300ms ease-in-out;
 }
 
 /* Vinyl Spinning Disc */
@@ -92,9 +94,9 @@ body {
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: radial-gradient(circle, #080808 30%, #151515 65%, #050505 100%);
-  border: 4px solid #222;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  background: radial-gradient(circle, #1a1918 20%, #2b2927 50%, #151413 100%);
+  border: 4px solid var(--aur-deck);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,7 +108,8 @@ body {
   height: 130px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--aur-bronze);
+  border: 3px solid var(--aur-gold-accent);
+  box-shadow: 0 0 12px var(--aur-gold-glow);
   transition: transform 12s linear;
 }
 
@@ -119,9 +122,62 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* Import Button */
+.aur-import-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--btn-standard-bg);
+  border: var(--btn-standard-border);
+  border-radius: var(--radius-button);
+  color: var(--aur-text-main);
+  font-family: var(--font-brand);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--aur-shadow-soft);
+  transition: all 180ms ease-out;
+}
+
+.aur-import-btn:hover {
+  background: var(--btn-standard-hover);
+  border-color: var(--aur-gold-accent);
+  color: var(--aur-gold-accent);
+  box-shadow: 0 4px 10px var(--aur-gold-glow);
+}
+
+.aur-import-btn:active {
+  transform: translateY(1px);
+}
+
 /* Right Panel: Controls & Visualizer Deck */
 .aur-control-deck {
   display: flex;
   flex-direction: column;
   gap: var(--space-24);
+}
+
+/* Header & Logo */
+.aur-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aur-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-brand);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--aur-text-main);
+}
+
+.aur-logo svg {
+  stroke: var(--aur-gold-accent);
 }

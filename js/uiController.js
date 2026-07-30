@@ -1,5 +1,5 @@
 /**
- * Sonance UIController - SoundCloud-Style Static Waveform Scrubber & Clickable Host ID Badge
+ * Sonance UIController - Multi-Theme Listening Edition Engine & Waveform Scrubber
  */
 export class UIController {
   /**
@@ -29,6 +29,9 @@ export class UIController {
     this.currentTimeDisplay = document.getElementById('current-time');
     this.durationDisplay = document.getElementById('duration');
 
+    // Theme Selector
+    this.themeSelector = document.getElementById('theme-selector');
+
     // Waveform Scrubber Canvas
     this.waveformCanvas = document.getElementById('waveform-scrubber');
     this.waveformCtx = this.waveformCanvas ? this.waveformCanvas.getContext('2d') : null;
@@ -54,6 +57,7 @@ export class UIController {
     this.colorThief = (typeof window.ColorThief !== 'undefined') ? new window.ColorThief() : null;
 
     this.initWaveformCanvas();
+    this.bindThemeSelector();
     this.bindSubsystemTabs();
     this.bindFileTriggers();
     this.bindTransportEvents();
@@ -95,6 +99,17 @@ export class UIController {
 
     this.waveformCtx.clearRect(0, 0, w, h);
 
+    const currentTheme = document.documentElement.dataset.theme || 'aurora';
+    let playedStart = '#A78BFA';
+    let playedEnd = '#6366F1';
+    let unplayed = '#262626';
+
+    if (currentTheme === 'opus') {
+      playedStart = '#D6AE45';
+      playedEnd = '#C49A27';
+      unplayed = '#D7D2C7';
+    }
+
     const peaks = this.peaksArray;
     const barCount = (peaks && peaks.length > 0) ? peaks.length : 120;
     const barWidth = (w / barCount) * 0.6;
@@ -118,11 +133,11 @@ export class UIController {
 
       if (barRatio <= progressRatio) {
         const grad = this.waveformCtx.createLinearGradient(0, y, 0, y + barHeight);
-        grad.addColorStop(0, '#8b5cf6');
-        grad.addColorStop(1, '#6366f1');
+        grad.addColorStop(0, playedStart);
+        grad.addColorStop(1, playedEnd);
         this.waveformCtx.fillStyle = grad;
       } else {
-        this.waveformCtx.fillStyle = '#262626';
+        this.waveformCtx.fillStyle = unplayed;
       }
 
       this.waveformCtx.beginPath();
@@ -133,6 +148,23 @@ export class UIController {
       }
       this.waveformCtx.fill();
     }
+  }
+
+  bindThemeSelector() {
+    if (!this.themeSelector) return;
+
+    this.themeSelector.addEventListener('change', (e) => {
+      const selectedTheme = e.target.value;
+      document.documentElement.dataset.theme = selectedTheme;
+      this.eventBus.emit('THEME_CHANGED', selectedTheme);
+      this.drawWaveform();
+
+      const labels = {
+        aurora: 'Aurora (Night Edition)',
+        opus: 'Opus (Signature Edition)'
+      };
+      this.showToast(`Listening Edition Switched: ${labels[selectedTheme] || selectedTheme}`);
+    });
   }
 
   bindSubsystemTabs() {
@@ -358,6 +390,14 @@ export class UIController {
       this.drawWaveform();
     });
 
+    this.eventBus.on('THEME_RESTORED', (theme) => {
+      if (theme && this.themeSelector) {
+        this.themeSelector.value = theme;
+        document.documentElement.dataset.theme = theme;
+        this.drawWaveform();
+      }
+    });
+
     this.eventBus.on('PARTY_STATUS_UPDATED', ({ role, peerId, fullPeerId, status }) => {
       this.partyRole = role;
       this.currentHostId = fullPeerId || peerId || null;
@@ -446,7 +486,9 @@ export class UIController {
 
   updateDynamicTheme(coverSrc) {
     if (!coverSrc || coverSrc.endsWith('icon.svg')) {
-      document.documentElement.style.setProperty('--dynamic-glow', 'rgba(139, 92, 246, 0.12)');
+      const currentTheme = document.documentElement.dataset.theme || 'aurora';
+      const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+      document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
       return;
     }
 
@@ -456,16 +498,22 @@ export class UIController {
       try {
         if (this.colorThief) {
           const [r, g, b] = this.colorThief.getColor(img);
-          document.documentElement.style.setProperty('--dynamic-glow', `rgba(${r}, ${g}, ${b}, 0.14)`);
+          document.documentElement.style.setProperty('--dynamic-glow', `rgba(${r}, ${g}, ${b}, 0.10)`);
         } else {
-          document.documentElement.style.setProperty('--dynamic-glow', 'rgba(139, 92, 246, 0.12)');
+          const currentTheme = document.documentElement.dataset.theme || 'aurora';
+          const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+          document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
         }
       } catch (err) {
-        document.documentElement.style.setProperty('--dynamic-glow', 'rgba(139, 92, 246, 0.12)');
+        const currentTheme = document.documentElement.dataset.theme || 'aurora';
+        const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+        document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
       }
     };
     img.onerror = () => {
-      document.documentElement.style.setProperty('--dynamic-glow', 'rgba(139, 92, 246, 0.12)');
+      const currentTheme = document.documentElement.dataset.theme || 'aurora';
+      const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+      document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
     };
     img.src = coverSrc;
   }
@@ -476,13 +524,13 @@ export class UIController {
 
     if (!this.currentQueue || this.currentQueue.length === 0) {
       this.libraryContainer.innerHTML = `
-        <div class="empty-queue-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 160px; text-align: center; opacity: 0.7; padding: 24px 12px;">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.5" style="margin-bottom: 12px;">
+        <div class="empty-queue-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 160px; text-align: center; opacity: 0.75; padding: 24px 12px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--aur-gold-accent)" stroke-width="1.5" style="margin-bottom: 12px;">
             <path d="M9 18V5l12-2v13"></path>
             <circle cx="6" cy="18" r="3"></circle>
             <circle cx="18" cy="16" r="3"></circle>
           </svg>
-          <p style="font-family: var(--font-brand); font-size: 14px; color: #F5F5F5; margin-bottom: 4px; font-weight: 600;">Queue is empty</p>
+          <p style="font-family: var(--font-brand); font-size: 14px; color: var(--aur-text-main); margin-bottom: 4px; font-weight: 600;">Queue is empty</p>
           <p style="font-family: var(--font-body); font-size: 13px; color: var(--aur-text-muted);">Import or drag-and-drop tracks to begin</p>
         </div>
       `;

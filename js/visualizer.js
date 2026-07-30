@@ -1,5 +1,5 @@
 /**
- * Auralis Visualizer - 60FPS Champagne Gold Canvas Spectrum & Waveform Renderer
+ * Sonance Visualizer - 60FPS Canvas Spectrum & Waveform Renderer
  * 
  * Performance Optimized: Listens for ANALYSER_READY once, pauses requestAnimationFrame loop when audio is paused.
  */
@@ -103,15 +103,15 @@ export class Visualizer {
     for (let i = 0; i < bufferLength; i++) {
       const barHeight = (dataArray[i] / 255) * height;
 
-      // Champagne Gold Accent Palette (#8C652B -> #D4A359 -> #F3D08A)
+      // Electric Violet / Deep Indigo Gradient
       const gradient = this.ctx.createLinearGradient(0, height, 0, 0);
-      gradient.addColorStop(0, '#8c652b');
-      gradient.addColorStop(0.5, '#d4a359');
-      gradient.addColorStop(1, '#f3d08a');
+      gradient.addColorStop(0, '#6366f1');
+      gradient.addColorStop(0.5, '#8b5cf6');
+      gradient.addColorStop(1, '#a78bfa');
 
       this.ctx.fillStyle = gradient;
       this.ctx.shadowBlur = 8;
-      this.ctx.shadowColor = 'rgba(212, 163, 89, 0.4)';
+      this.ctx.shadowColor = 'rgba(139, 92, 246, 0.4)';
       this.ctx.fillRect(x, height - barHeight, barWidth, barHeight);
 
       x += barWidth + 2;
@@ -124,9 +124,9 @@ export class Visualizer {
     this.analyserNode.getByteTimeDomainData(dataArray);
 
     this.ctx.lineWidth = 3;
-    this.ctx.strokeStyle = '#d4a359';
+    this.ctx.strokeStyle = '#8b5cf6';
     this.ctx.shadowBlur = 10;
-    this.ctx.shadowColor = 'rgba(212, 163, 89, 0.5)';
+    this.ctx.shadowColor = 'rgba(139, 92, 246, 0.5)';
     this.ctx.beginPath();
 
     const sliceWidth = width / bufferLength;
@@ -159,7 +159,7 @@ export class Visualizer {
 
     this.ctx.beginPath();
     this.ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    this.ctx.strokeStyle = '#8c652b';
+    this.ctx.strokeStyle = '#6366f1';
     this.ctx.stroke();
 
     for (let i = 0; i < bufferLength; i += 4) {
@@ -171,9 +171,9 @@ export class Visualizer {
       const x2 = centerX + Math.cos(angle) * (radius + barLen);
       const y2 = centerY + Math.sin(angle) * (radius + barLen);
 
-      this.ctx.strokeStyle = '#f3d08a';
+      this.ctx.strokeStyle = '#8b5cf6';
       this.ctx.shadowBlur = 6;
-      this.ctx.shadowColor = 'rgba(243, 208, 138, 0.4)';
+      this.ctx.shadowColor = 'rgba(139, 92, 246, 0.4)';
       this.ctx.beginPath();
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);

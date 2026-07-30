@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="aurora">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,7 +69,7 @@
       <!-- Right Panel: Controls, OLED Display, Waveform Scrubber & Subsystem Tabs -->
       <section class="aur-control-deck">
         
-        <!-- Header & Remote Party Badge -->
+        <!-- Header, Listening Mode Theme Selector & Remote Party Badge -->
         <header class="aur-header">
           <div class="aur-logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -78,15 +78,23 @@
             <span>SONANCE</span>
           </div>
 
-          <button id="party-badge" class="aur-party-badge" title="Start or Join Remote Party">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <span>Remote Party</span>
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <!-- Theme Listening Edition Selector -->
+            <select id="theme-selector" class="aur-preset-chip" style="padding: 6px 12px; font-weight: 600; cursor: pointer; outline: none;" title="Select Listening Edition Theme">
+              <option value="aurora">Aurora (Night Edition)</option>
+              <option value="opus">Opus (Signature Edition)</option>
+            </select>
+
+            <button id="party-badge" class="aur-party-badge" title="Start or Join Remote Party">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <span>Remote Party</span>
+            </button>
+          </div>
         </header>
 
         <!-- Smoked Glass OLED Screen Display -->
@@ -143,7 +151,7 @@
         <!-- Tab 3: Peers (Network) -->
         <div id="tab-peers" class="aur-tab-content" role="tabpanel">
           <div style="padding: 20px; background: rgba(255,255,255,0.02); border: var(--aur-glass-border); border-radius: var(--radius-deck); display: flex; flex-direction: column; gap: 12px;">
-            <h3 style="font-family: var(--font-brand); color: #fff; font-size: 1rem;">Serverless WebRTC Remote Party</h3>
+            <h3 style="font-family: var(--font-brand); color: var(--aur-text-main); font-size: 1rem;">Serverless WebRTC Remote Party</h3>
             <p style="color: var(--aur-text-muted); font-size: 0.82rem;">Create a session as Host to stream local MP3 ArrayBuffer buffers to guests, or enter a Room ID to join as Guest.</p>
             <div style="display: flex; gap: 12px;">
               <button id="btn-party-host" class="aur-preset-chip" style="flex: 1;">Start Host Party</button>

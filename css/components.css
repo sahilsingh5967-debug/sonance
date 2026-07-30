@@ -1,15 +1,41 @@
 /* ==========================================================================
-   SONANCE COMPONENTS - SUBSYSTEM TABS, TECHNICAL BADGES & OVERLAYS
+   SONANCE COMPONENTS - FULLY SCOPED MULTI-THEME ENGINE
    ========================================================================== */
+
+/* Theme Selector Dropdown */
+#theme-selector {
+  background: var(--aur-deck);
+  border: var(--aur-border-panel);
+  color: var(--aur-text-main);
+  padding: 7px 14px;
+  border-radius: var(--radius-badge);
+  font-family: var(--font-brand);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 180ms ease-out;
+  box-shadow: var(--aur-shadow-soft);
+}
+
+#theme-selector:hover {
+  border-color: var(--aur-gold-accent);
+}
+
+#theme-selector option {
+  background: var(--aur-chassis);
+  color: var(--aur-text-main);
+}
 
 /* Subsystem Navigation Tabs */
 .aur-tabs-bar {
   display: flex;
-  background: rgba(255, 255, 255, 0.03);
-  border: var(--aur-glass-border);
-  border-radius: var(--radius-chip);
+  background: var(--aur-deck);
+  border: var(--aur-border-panel);
+  border-radius: var(--radius-card);
   padding: 4px;
   gap: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .aur-tab-btn {
@@ -17,13 +43,13 @@
   background: transparent;
   border: none;
   color: var(--aur-text-muted);
-  padding: 8px 12px;
+  padding: 9px 14px;
   font-family: var(--font-brand);
   font-size: 0.85rem;
   font-weight: 500;
-  border-radius: 6px;
+  border-radius: var(--radius-button);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 180ms ease-out;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,13 +58,14 @@
 
 .aur-tab-btn:hover {
   color: var(--aur-text-main);
-  background: rgba(139, 92, 246, 0.1);
+  background: var(--card-bg-hover);
 }
 
 .aur-tab-btn.active {
-  background: var(--aur-violet);
-  color: #ffffff;
-  box-shadow: 0 4px 14px var(--aur-violet-glow);
+  background: var(--btn-primary-bg);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 2px 6px var(--aur-gold-glow);
 }
 
 /* Subsystem Panel Containers */
@@ -65,7 +92,25 @@
   gap: 8px;
 }
 
-/* Technical Audiophile Badges */
+/* Custom Thin Hi-Fi Scrollbar */
+.aur-library-panel::-webkit-scrollbar,
+.aur-palette-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aur-library-panel::-webkit-scrollbar-track,
+.aur-palette-list::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.aur-library-panel::-webkit-scrollbar-thumb,
+.aur-palette-list::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+
+/* Technical Audiophile Badges (Capsule Radii) */
 .aur-badge-row {
   display: flex;
   gap: 8px;
@@ -78,32 +123,33 @@
   font-family: var(--font-oled);
   font-size: 0.68rem;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: var(--radius-badge);
+  background: var(--aur-deck);
+  border: var(--aur-border-subtle);
   color: var(--aur-text-muted);
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
 .aur-badge-live {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--aur-live-glow);
   border-color: var(--aur-live-green);
   color: var(--aur-live-green);
-  box-shadow: 0 0 10px var(--aur-live-glow);
+  box-shadow: 0 2px 6px var(--aur-live-glow);
 }
 
-/* Waveform Scrubber Canvas */
+/* Waveform Scrubber Canvas Wrapper */
 .aur-waveform-wrapper {
   position: relative;
   width: 100%;
   height: 48px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  border-radius: var(--radius-chip);
+  background: var(--wave-bg);
+  border: var(--wave-border);
+  border-radius: var(--radius-input);
   overflow: hidden;
   cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .aur-waveform-canvas {
@@ -112,27 +158,28 @@
   display: block;
 }
 
-/* Smoked Glass OLED Screen */
+/* White Satin OLED / Display Screen Panel */
 .aur-oled-display {
   background: var(--aur-oled);
-  border: var(--aur-glass-border);
-  border-radius: var(--radius-deck);
+  border: var(--aur-border-panel);
+  border-radius: var(--radius-card);
   padding: var(--space-20);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.9);
+  box-shadow: var(--aur-shadow-soft);
 }
 
 .aur-track-title {
   font-family: var(--font-brand);
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 4px;
+  color: var(--aur-text-main);
+  margin-bottom: 2px;
 }
 
 .aur-track-artist {
   font-family: var(--font-body);
   font-size: 0.85rem;
-  color: var(--aur-violet);
+  font-weight: 500;
+  color: var(--aur-gold-accent);
 }
 
 .aur-oled-time {
@@ -144,46 +191,102 @@
   margin-top: 8px;
 }
 
+/* Range Input Sliders (Master Volume & 5-Band EQ) */
+.aur-knob-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.aur-knob-label {
+  font-family: var(--font-oled);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--aur-text-muted);
+  text-transform: uppercase;
+}
+
+.aur-knob-input {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--aur-deck);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  transition: background 180ms ease-out;
+}
+
+.aur-knob-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--aur-chassis);
+  border: 2px solid var(--aur-gold-accent);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform 150ms ease-out, background 150ms ease-out;
+}
+
+.aur-knob-input::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+  border-color: var(--aur-gold-hover);
+}
+
 /* Equalizer Presets & Chips */
+.aur-preset-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
 .aur-preset-chip {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--aur-deck);
+  border: var(--aur-border-subtle);
   color: var(--aur-text-muted);
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius-badge);
   font-family: var(--font-brand);
   font-size: 0.78rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 180ms ease-out;
 }
 
 .aur-preset-chip.active, .aur-preset-chip:hover {
-  background: var(--aur-indigo);
-  color: #ffffff;
-  border-color: var(--aur-indigo);
+  background: var(--aur-gold-accent);
+  color: #FFFFFF;
+  border-color: var(--aur-gold-accent);
+  box-shadow: 0 2px 6px var(--aur-gold-glow);
 }
 
 /* Remote Party Status Badge */
 .aur-party-badge {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--aur-deck);
+  border: var(--aur-border-panel);
   color: var(--aur-text-main);
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border-radius: var(--radius-badge);
   display: flex;
   align-items: center;
   gap: 6px;
   font-family: var(--font-brand);
   font-size: 0.8rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  max-width: 100%;
+  transition: all 180ms ease-out;
 }
 
 .aur-party-badge.connected {
   border-color: var(--aur-live-green);
   color: var(--aur-live-green);
-  box-shadow: 0 0 12px var(--aur-live-glow);
+  background: var(--aur-live-glow);
+  box-shadow: 0 2px 6px var(--aur-live-glow);
 }
 
 /* Track Cards in Queue */
@@ -191,36 +294,40 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid transparent;
-  border-radius: 8px;
+  padding: 10px 14px;
+  background: var(--card-bg-normal);
+  border: var(--aur-border-subtle);
+  border-radius: var(--radius-button);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 180ms ease-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .aur-track-card:hover {
-  background: rgba(139, 92, 246, 0.1);
+  background: var(--card-bg-hover);
+  border-color: var(--aur-gold-hover);
+  transform: translateY(-1px);
 }
 
 .aur-track-card.active {
-  background: rgba(139, 92, 246, 0.18);
-  border-color: var(--aur-violet);
+  background: var(--card-bg-active);
+  border-color: var(--card-border-active);
+  box-shadow: 0 2px 8px var(--aur-gold-glow);
 }
 
 .aur-track-thumb {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: 8px;
   object-fit: cover;
 }
 
 .aur-fallback-art {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, var(--aur-indigo), var(--aur-violet));
-  color: #fff;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--aur-gold-light), var(--aur-gold-accent));
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,14 +346,75 @@
   color: var(--aur-text-main);
 }
 
+.aur-track-card.active .aur-track-name {
+  color: var(--aur-gold-accent);
+}
+
 .aur-track-artist-sub {
   font-size: 0.75rem;
   color: var(--aur-text-muted);
 }
 
-/* ==========================================================================
-   FIXED OVERLAYS: COMMAND PALETTE & TOAST NOTIFICATION
-   ========================================================================== */
+/* Transport Controls & Large Circular Play Button */
+.aur-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.aur-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--btn-standard-bg);
+  border: var(--btn-standard-border);
+  color: var(--aur-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--aur-shadow-soft);
+  transition: all 180ms ease-out;
+}
+
+.aur-btn:hover {
+  background: var(--btn-standard-hover);
+  border-color: var(--aur-gold-accent);
+  color: var(--aur-gold-accent);
+  transform: translateY(-1px);
+}
+
+.aur-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Large CNC-Machined Primary Play Button */
+.aur-btn-primary {
+  width: 62px;
+  height: 62px;
+  background: var(--btn-primary-bg);
+  border: var(--btn-primary-border);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px var(--aur-gold-glow);
+}
+
+.aur-btn-primary:hover {
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+  box-shadow: 0 6px 18px var(--aur-gold-glow);
+  transform: scale(1.04);
+}
+
+.aur-btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.hidden {
+  display: none !important;
+}
 
 /* Command Palette Modal Overlay */
 .aur-palette-overlay {
@@ -255,7 +423,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(7, 7, 10, 0.85);
+  background: var(--overlay-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 9999;
@@ -269,37 +437,37 @@
 }
 
 .aur-palette-card {
-  background: #12121a;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  border-radius: 16px;
+  background: var(--modal-card-bg);
+  border: var(--modal-card-border);
+  border-radius: var(--radius-card);
   width: 90%;
   max-width: 520px;
   padding: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--aur-violet-glow);
-  animation: paletteScale 0.2s ease forwards;
+  box-shadow: var(--modal-card-shadow);
+  animation: paletteScale 180ms ease-out forwards;
 }
 
 @keyframes paletteScale {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
 
 .aur-palette-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  background: var(--modal-input-bg);
+  border: var(--aur-border-subtle);
+  border-radius: var(--radius-input);
   padding: 12px 16px;
-  color: #ffffff;
+  color: var(--aur-text-main);
   font-family: var(--font-brand);
   font-size: 0.95rem;
   outline: none;
   margin-bottom: 16px;
-  transition: border-color 0.2s ease;
+  transition: border-color 180ms ease-out;
 }
 
 .aur-palette-input:focus {
-  border-color: var(--aur-violet);
+  border-color: var(--aur-gold-accent);
 }
 
 .aur-palette-list {
@@ -315,28 +483,28 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid transparent;
-  border-radius: 8px;
+  background: var(--aur-deck);
+  border: var(--aur-border-subtle);
+  border-radius: var(--radius-button);
   color: var(--aur-text-main);
   font-family: var(--font-brand);
   font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 180ms ease-out;
 }
 
 .aur-palette-item:hover {
-  background: rgba(139, 92, 246, 0.15);
-  border-color: var(--aur-violet);
+  background: var(--aur-gold-glow);
+  border-color: var(--aur-gold-accent);
 }
 
 .aur-palette-shortcut {
   font-family: var(--font-oled);
   font-size: 0.75rem;
   color: var(--aur-text-muted);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--aur-chassis);
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-chip);
 }
 
 /* Toast Notification Overlay */
@@ -348,13 +516,13 @@
   pointer-events: none;
   opacity: 0;
   transform: translateY(12px);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  background: #12121a;
-  border: 1px solid var(--aur-violet);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--aur-violet-glow);
+  transition: all 220ms ease-out;
+  background: var(--modal-card-bg);
+  border: 1px solid var(--aur-gold-accent);
+  box-shadow: 0 4px 14px var(--aur-gold-glow);
   color: var(--aur-text-main);
   padding: 12px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-button);
   font-family: var(--font-brand);
   font-size: 0.88rem;
   font-weight: 500;
