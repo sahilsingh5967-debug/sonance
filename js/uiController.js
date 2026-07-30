@@ -108,6 +108,10 @@ export class UIController {
       playedStart = '#D6AE45';
       playedEnd = '#C49A27';
       unplayed = '#D7D2C7';
+    } else if (currentTheme === 'studio') {
+      playedStart = '#F1C642';
+      playedEnd = '#D7A628';
+      unplayed = '#3A3A3A';
     }
 
     const peaks = this.peaksArray;
@@ -161,7 +165,8 @@ export class UIController {
 
       const labels = {
         aurora: 'Aurora (Night Edition)',
-        opus: 'Opus (Signature Edition)'
+        opus: 'Opus (Signature Edition)',
+        studio: 'Studio (Reference Edition)'
       };
       this.showToast(`Listening Edition Switched: ${labels[selectedTheme] || selectedTheme}`);
     });
@@ -487,7 +492,9 @@ export class UIController {
   updateDynamicTheme(coverSrc) {
     if (!coverSrc || coverSrc.endsWith('icon.svg')) {
       const currentTheme = document.documentElement.dataset.theme || 'aurora';
-      const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+      let defaultGlow = 'rgba(139, 92, 246, 0.12)';
+      if (currentTheme === 'opus') defaultGlow = 'rgba(196, 154, 39, 0.08)';
+      if (currentTheme === 'studio') defaultGlow = 'rgba(215, 166, 40, 0.05)';
       document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
       return;
     }
@@ -501,18 +508,24 @@ export class UIController {
           document.documentElement.style.setProperty('--dynamic-glow', `rgba(${r}, ${g}, ${b}, 0.10)`);
         } else {
           const currentTheme = document.documentElement.dataset.theme || 'aurora';
-          const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+          let defaultGlow = 'rgba(139, 92, 246, 0.12)';
+          if (currentTheme === 'opus') defaultGlow = 'rgba(196, 154, 39, 0.08)';
+          if (currentTheme === 'studio') defaultGlow = 'rgba(215, 166, 40, 0.05)';
           document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
         }
       } catch (err) {
         const currentTheme = document.documentElement.dataset.theme || 'aurora';
-        const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+        let defaultGlow = 'rgba(139, 92, 246, 0.12)';
+        if (currentTheme === 'opus') defaultGlow = 'rgba(196, 154, 39, 0.08)';
+        if (currentTheme === 'studio') defaultGlow = 'rgba(215, 166, 40, 0.05)';
         document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
       }
     };
     img.onerror = () => {
       const currentTheme = document.documentElement.dataset.theme || 'aurora';
-      const defaultGlow = currentTheme === 'opus' ? 'rgba(196, 154, 39, 0.08)' : 'rgba(139, 92, 246, 0.12)';
+      let defaultGlow = 'rgba(139, 92, 246, 0.12)';
+      if (currentTheme === 'opus') defaultGlow = 'rgba(196, 154, 39, 0.08)';
+      if (currentTheme === 'studio') defaultGlow = 'rgba(215, 166, 40, 0.05)';
       document.documentElement.style.setProperty('--dynamic-glow', defaultGlow);
     };
     img.src = coverSrc;
