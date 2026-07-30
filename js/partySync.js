@@ -1,5 +1,11 @@
 /**
- * Sonance PartySync - WebRTC PeerJS Remote Party Synchronization & Full Host ID Sharing
+ * Sonance PartySync - Production-Grade Resilient WebRTC PeerJS Networking Layer
+ * 
+ * Handles full PeerJS lifecycle events, reconnection logic, and comprehensive error mapping:
+ * - Peer Events: open, connection, error, close, disconnected
+ * - Connection Events: open, data, close, error
+ * - Error Types: network, peer-unavailable, server-error, socket-error, webrtc, 
+ *                browser-incompatible, ssl-unavailable, unavailable-id, invalid-id
  */
 export class PartySync {
   /**
@@ -12,6 +18,8 @@ export class PartySync {
     this.isHost = false;
     this.fullPeerId = null;
     this.lastTimeBroadcast = 0;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 3;
 
     this.bindEvents();
   }
@@ -44,7 +52,7 @@ export class PartySync {
       }
     });
 
-    // P2P File Transfer on Track Change
+    // P2P Audio File Transfer on Track Change
     this.eventBus.on('CURRENT_TRACK_CHANGED', (trackObject) => {
       if (this.isHost && trackObject && trackObject.originalFile) {
         this.transferAudioFile(trackObject);
@@ -52,31 +60,97 @@ export class PartySync {
     });
   }
 
+  /**
+   * Host Session Initialization & Peer Lifecycle Setup
+   */
   startHostSession() {
     if (typeof window.Peer === 'undefined') {
-      this.eventBus.emit('TOAST_SHOW', 'PeerJS Library Not Loaded');
+      this.handlePeerError({ type: 'browser-incompatible', message: 'PeerJS WebRTC Library Not Loaded' });
       return;
     }
 
+    this.cleanupPeer();
     this.isHost = true;
-    this.peer = new window.Peer();
 
+    try {
+      this.peer = new window.Peer();
+      this.attachPeerLifecycleListeners('host');
+    } catch (err) {
+      this.handlePeerError({ type: 'webrtc', message: 'Failed to instantiate Host Peer session', error: err });
+    }
+  }
+
+  /**
+   * Guest Session Initialization & Connection Setup
+   * @param {string} hostId 
+   */
+  joinGuestSession(hostId) {
+    if (!hostId || !hostId.trim()) {
+      this.handlePeerError({ type: 'invalid-id', message: 'Invalid or empty Host Room ID' });
+      return;
+    }
+
+    if (typeof window.Peer === 'undefined') {
+      this.handlePeerError({ type: 'browser-incompatible', message: 'PeerJS WebRTC Library Not Loaded' });
+      return;
+    }
+
+    const cleanHostId = hostId.trim();
+    this.cleanupPeer();
+    this.isHost = false;
+
+    try {
+      this.peer = new window.Peer();
+      this.attachPeerLifecycleListeners('guest', cleanHostId);
+    } catch (err) {
+      this.handlePeerError({ type: 'webrtc', message: 'Failed to instantiate Guest Peer session', error: err });
+    }
+  }
+
+  /**
+   * Attaches handlers for all PeerJS lifecycle events: open, connection, error, close, disconnected
+   * @param {'host'|'guest'} role 
+   * @param {string} [targetHostId] 
+   */
+  attachPeerLifecycleListeners(role, targetHostId = null) {
+    if (!this.peer) return;
+
+    // 1. peer.on("open")
     this.peer.on('open', (peerId) => {
       this.fullPeerId = peerId;
-      console.log('[PartySync Host] Full Peer ID Created:', peerId);
-      this.eventBus.emit('PARTY_STATUS_UPDATED', {
-        role: 'host',
-        peerId,
-        fullPeerId: peerId,
-        status: `Host (ID: ${peerId})`
-      });
-      this.eventBus.emit('TOAST_SHOW', `Host Room ID Created! Click badge to copy.`);
+      this.reconnectAttempts = 0;
+      console.log(`[PartySync ${role.toUpperCase()}] Peer Open (ID: ${peerId})`);
+
+      if (role === 'host') {
+        this.eventBus.emit('PARTY_STATUS_UPDATED', {
+          role: 'host',
+          peerId,
+          fullPeerId: peerId,
+          status: `Host (ID: ${peerId})`
+        });
+        this.eventBus.emit('TOAST_SHOW', `Host Room Created! Click badge to copy ID.`);
+      } else if (role === 'guest' && targetHostId) {
+        console.log(`[PartySync GUEST] Connecting to Host ID: ${targetHostId}`);
+        this.eventBus.emit('PARTY_STATUS_UPDATED', {
+          role: 'guest',
+          peerId: targetHostId,
+          fullPeerId: targetHostId,
+          status: 'Connecting to Host...'
+        });
+
+        try {
+          const conn = this.peer.connect(targetHostId, { reliable: true });
+          this.setupConnectionHandlers(conn);
+        } catch (err) {
+          this.handlePeerError({ type: 'webrtc', message: `Could not initiate connection to ${targetHostId}`, error: err });
+        }
+      }
     });
 
+    // 2. peer.on("connection") - Incoming Host connections
     this.peer.on('connection', (conn) => {
-      this.activeConnection = conn;
-      console.log('[PartySync Host] Guest Connected');
-      this.setupConnectionHandlers();
+      console.log(`[PartySync HOST] Incoming connection from Guest: ${conn.peer}`);
+      this.setupConnectionHandlers(conn);
       this.eventBus.emit('PARTY_STATUS_UPDATED', {
         role: 'host',
         peerId: this.peer.id,
@@ -86,71 +160,129 @@ export class PartySync {
       this.eventBus.emit('TOAST_SHOW', 'Remote Party Guest Connected!');
     });
 
+    // 3. peer.on("disconnected") - Signaling socket loss
     this.peer.on('disconnected', () => {
-      this.handleDisconnect('Host Peer Disconnected');
+      console.warn(`[PartySync ${role.toUpperCase()}] Peer Disconnected from signaling server.`);
+      
+      if (this.reconnectAttempts < this.maxReconnectAttempts && this.peer && !this.peer.destroyed) {
+        this.reconnectAttempts++;
+        console.log(`[PartySync] Attempting signaling server reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+        try {
+          this.peer.reconnect();
+        } catch (err) {
+          console.error('[PartySync] Reconnect attempt failed:', err);
+        }
+      } else {
+        this.handlePeerError({ type: 'network', message: 'Signaling server connection lost permanently.' });
+        this.handleDisconnect('Host Disconnected');
+      }
     });
 
+    // 4. peer.on("close") - Peer destroyed
+    this.peer.on('close', () => {
+      console.log(`[PartySync ${role.toUpperCase()}] Peer session closed.`);
+      this.handleDisconnect('Party Session Closed');
+    });
+
+    // 5. peer.on("error") - Peer error dispatcher
     this.peer.on('error', (err) => {
-      console.warn('[PartySync Host Error]', err);
-      this.eventBus.emit('TOAST_SHOW', 'PeerJS Error: ' + err.message);
+      this.handlePeerError(err);
     });
   }
 
-  joinGuestSession(hostId) {
-    if (!hostId || typeof window.Peer === 'undefined') return;
+  /**
+   * Attaches handlers for DataConnection lifecycle events: open, data, close, error
+   * @param {import('peerjs').DataConnection} conn 
+   */
+  setupConnectionHandlers(conn) {
+    if (!conn) return;
+    this.activeConnection = conn;
 
-    this.isHost = false;
-    this.peer = new window.Peer();
-
-    this.peer.on('open', () => {
-      console.log('[PartySync Guest] Connecting to Host:', hostId);
-      this.activeConnection = this.peer.connect(hostId);
-      this.setupConnectionHandlers();
-      this.eventBus.emit('PARTY_STATUS_UPDATED', {
-        role: 'guest',
-        peerId: hostId,
-        fullPeerId: hostId,
-        status: 'Connecting to Host...'
-      });
-    });
-
-    this.peer.on('disconnected', () => {
-      this.handleDisconnect('Host Disconnected');
-    });
-
-    this.peer.on('error', (err) => {
-      console.warn('[PartySync Guest Error]', err);
-      this.eventBus.emit('TOAST_SHOW', 'Failed to connect to Host ID');
-    });
-  }
-
-  setupConnectionHandlers() {
-    if (!this.activeConnection) return;
-
-    this.activeConnection.on('open', () => {
-      console.log('[PartySync] WebRTC Connection Active');
+    // 1. connection.on("open")
+    conn.on('open', () => {
+      console.log(`[PartySync P2P Channel] Open with Peer: ${conn.peer}`);
       if (!this.isHost) {
         this.eventBus.emit('PARTY_STATUS_UPDATED', {
           role: 'guest',
-          peerId: this.activeConnection.peer,
-          fullPeerId: this.activeConnection.peer,
+          peerId: conn.peer,
+          fullPeerId: conn.peer,
           status: 'Connected (Live P2P)'
         });
         this.eventBus.emit('TOAST_SHOW', 'Connected to Host Party!');
       }
     });
 
-    this.activeConnection.on('data', (payload) => {
+    // 2. connection.on("data")
+    conn.on('data', (payload) => {
       this.handleGuestPayload(payload);
     });
 
-    this.activeConnection.on('close', () => {
-      this.handleDisconnect('Host Disconnected');
+    // 3. connection.on("close")
+    conn.on('close', () => {
+      console.log(`[PartySync P2P Channel] Closed with Peer: ${conn.peer}`);
+      this.handleDisconnect(this.isHost ? 'Guest Disconnected' : 'Host Disconnected');
     });
 
-    this.activeConnection.on('error', (err) => {
-      this.handleDisconnect('Party Disconnected');
+    // 4. connection.on("error")
+    conn.on('error', (err) => {
+      console.error(`[PartySync P2P Channel Error] Peer: ${conn.peer}`, err);
+      this.handlePeerError({ type: 'webrtc', message: 'WebRTC P2P Data Channel Error', error: err });
+      this.handleDisconnect('Party Data Channel Error');
     });
+  }
+
+  /**
+   * Maps and handles ALL major PeerJS error codes cleanly
+   * @param {Object} err 
+   */
+  handlePeerError(err) {
+    const errorType = err ? (err.type || 'unknown') : 'unknown';
+    let readableMessage = 'A WebRTC network error occurred.';
+
+    switch (errorType) {
+      case 'network':
+        readableMessage = 'Network connection to PeerServer lost or failed.';
+        break;
+      case 'peer-unavailable':
+        readableMessage = 'Host Room ID is invalid, closed, or unavailable.';
+        break;
+      case 'server-error':
+        readableMessage = 'PeerServer encountered an internal error.';
+        break;
+      case 'socket-error':
+        readableMessage = 'WebSocket connection to PeerServer failed.';
+        break;
+      case 'webrtc':
+        readableMessage = 'WebRTC ICE candidate or STUN negotiation failed.';
+        break;
+      case 'browser-incompatible':
+        readableMessage = 'WebRTC Data Channel is incompatible with this browser.';
+        break;
+      case 'ssl-unavailable':
+        readableMessage = 'PeerServer SSL/HTTPS configuration is unavailable.';
+        break;
+      case 'unavailable-id':
+        readableMessage = 'Requested Peer ID is already in use by another session.';
+        break;
+      case 'invalid-id':
+        readableMessage = 'Provided Host Room ID contains invalid characters.';
+        break;
+      default:
+        readableMessage = err.message || 'An unexpected PeerJS networking error occurred.';
+        break;
+    }
+
+    console.error(`[PartySync Network Error] Type: "${errorType}" | Message: ${readableMessage}`, err);
+
+    // 1. Emit EventBus NETWORK_ERROR event
+    this.eventBus.emit('NETWORK_ERROR', {
+      type: errorType,
+      message: readableMessage,
+      error: err
+    });
+
+    // 2. Trigger user Toast notification
+    this.eventBus.emit('TOAST_SHOW', readableMessage);
   }
 
   handleDisconnect(reasonMessage) {
@@ -161,12 +293,31 @@ export class PartySync {
       role: 'standalone',
       status: reasonMessage || 'Standalone'
     });
-    this.eventBus.emit('TOAST_SHOW', reasonMessage || 'Party Connection Dropped');
+    this.eventBus.emit('TOAST_SHOW', reasonMessage || 'Party Session Ended');
+  }
+
+  cleanupPeer() {
+    if (this.activeConnection) {
+      try { this.activeConnection.close(); } catch (e) {}
+      this.activeConnection = null;
+    }
+
+    if (this.peer) {
+      try {
+        this.peer.off();
+        this.peer.destroy();
+      } catch (e) {}
+      this.peer = null;
+    }
   }
 
   broadcastPayload(payload) {
     if (this.isHost && this.activeConnection && this.activeConnection.open) {
-      this.activeConnection.send(payload);
+      try {
+        this.activeConnection.send(payload);
+      } catch (err) {
+        this.handlePeerError({ type: 'webrtc', message: 'Failed to broadcast WebRTC payload', error: err });
+      }
     }
   }
 
@@ -186,6 +337,9 @@ export class PartySync {
         },
         fileBuffer: buffer
       });
+    };
+    reader.onerror = (err) => {
+      this.handlePeerError({ type: 'webrtc', message: 'Failed to read audio file for P2P transfer', error: err });
     };
     reader.readAsArrayBuffer(trackObject.originalFile);
   }
@@ -226,9 +380,6 @@ export class PartySync {
 
   leaveParty() {
     this.handleDisconnect('Party Session Closed');
-    if (this.peer) {
-      this.peer.destroy();
-      this.peer = null;
-    }
+    this.cleanupPeer();
   }
 }
