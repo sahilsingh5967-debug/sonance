@@ -1,5 +1,9 @@
 # 🎵 SONANCE — Luxury Hi-Fi Music Player & WebRTC Remote Party PWA
 
+[![Sonance CI Pipeline](https://github.com/shahilraj/MusicPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/shahilraj/MusicPlayer/actions/workflows/ci.yml)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployment%20Ready-000000?logo=vercel&logoColor=white)](https://vercel.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > **A recruiter-grade, high-performance Progressive Web Application built with pure Vanilla JS (ES6), Web Audio API 5-Band DSP, Web Workers, Canvas Visualizers, and Serverless WebRTC PeerJS Audio Streaming.**
 
 ![Sonance Cover](./assets/icons/icon.svg)
@@ -42,6 +46,19 @@
 
 ---
 
+## ⚙️ Continuous Integration (CI) Workflow
+
+Sonance features a GitHub Actions Continuous Integration pipeline (`.github/workflows/ci.yml`) that automatically triggers on every `push` and `pull_request` to the `main` or `master` branches:
+
+1. **Repository Checkout**: Pulls codebase via `actions/checkout@v4`.
+2. **Node.js Environment Setup**: Initializes Node.js 20 environment with npm caching.
+3. **Dependency Installation**: Runs `npm install`.
+4. **Code Quality Linting**: Executes `npm run lint` (ESLint) for code standard compliance.
+5. **Automated Unit Testing**: Executes `npm test` across all ES6 unit test suites (`eventBus.test.js`, `playlist.test.js`, `audioEngine.test.js`, `partySync.test.js`).
+6. **Pipeline Fail-Fast Guard**: Automatically blocks code merges if any linting rule or unit test fails.
+
+---
+
 ## 🛠️ Technology Stack
 
 - **Core Engine**: HTML5, Vanilla CSS3 (Custom Design System), ES6 JavaScript Modules
@@ -50,6 +67,7 @@
 - **Visuals**: HTML5 Canvas 2D API & ColorThief
 - **P2P Networking**: WebRTC API & PeerJS
 - **Progressive Web App**: Service Workers & Cache API
+- **Continuous Integration**: GitHub Actions & ESLint
 
 ---
 

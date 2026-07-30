@@ -1,14 +1,21 @@
 {
-  "name": "auralis",
+  "name": "sonance",
   "version": "1.0.0",
   "description": "Luxury Hi-Fi Music Player & WebRTC Remote Party PWA",
   "main": "js/main.js",
   "type": "module",
   "scripts": {
-    "test": "node test/Auralis.test.js",
+    "test": "node test/eventBus.test.js && node test/playlist.test.js && node test/audioEngine.test.js && node test/partySync.test.js",
+    "lint": "eslint js/**/*.js test/**/*.js",
+    "format": "prettier --check \"**/*.{js,json,html,css}\"",
     "start": "python3 -m http.server 8081"
   },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  },
   "keywords": [
+    "sonance",
     "music-player",
     "pwa",
     "webrtc",
