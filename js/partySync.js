@@ -1,11 +1,5 @@
 /**
- * Sonance PartySync - Production-Grade Resilient WebRTC PeerJS Networking Layer
- * 
- * Handles full PeerJS lifecycle events, reconnection logic, and comprehensive error mapping:
- * - Peer Events: open, connection, error, close, disconnected
- * - Connection Events: open, data, close, error
- * - Error Types: network, peer-unavailable, server-error, socket-error, webrtc, 
- *                browser-incompatible, ssl-unavailable, unavailable-id, invalid-id
+ * Sonance PartySync - WebRTC PeerJS Networking Layer with Binary Chunking
  */
 export class PartySync {
   /**
@@ -14,12 +8,17 @@ export class PartySync {
   constructor(eventBus) {
     this.eventBus = eventBus;
     this.peer = null;
+    this.conn = null;
     this.activeConnection = null;
     this.isHost = false;
     this.fullPeerId = null;
     this.lastTimeBroadcast = 0;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 3;
+
+    // Buffer array for reassembling chunked P2P audio transfers on guest side
+    this.chunkBuffer = null;
+    this.receivedChunks = 0;
 
     this.bindEvents();
   }
@@ -107,15 +106,40 @@ export class PartySync {
     }
   }
 
-  /**
-   * Attaches handlers for all PeerJS lifecycle events: open, connection, error, close, disconnected
-   * @param {'host'|'guest'} role 
-   * @param {string} [targetHostId] 
-   */
+  // BUG 1 FIX: Enforce binary serialization on connection
+  connectToHost(hostId) {
+    if (!this.peer || !hostId) return;
+    const cleanHostId = hostId.trim();
+    
+    // Change default serialization to 'binary' to prevent ArrayBuffer corruption
+    this.conn = this.peer.connect(cleanHostId, { serialization: 'binary', reliable: true });
+    this.activeConnection = this.conn;
+
+    this.conn.on('open', () => {
+      console.log('[Sonance] Connected to host:', cleanHostId);
+      this.eventBus.emit('PARTY_STATUS_UPDATED', {
+        role: 'guest',
+        peerId: cleanHostId,
+        fullPeerId: cleanHostId,
+        status: 'Connected (Live P2P)'
+      });
+      this.eventBus.emit('TOAST_SHOW', 'Connected to Host Party!');
+    });
+
+    this.conn.on('data', (data) => this.handleGuestPayload(data));
+
+    this.conn.on('close', () => {
+      this.handleDisconnect('Host Disconnected');
+    });
+
+    this.conn.on('error', (err) => {
+      this.handlePeerError({ type: 'webrtc', message: 'Data Channel Error', error: err });
+    });
+  }
+
   attachPeerLifecycleListeners(role, targetHostId = null) {
     if (!this.peer) return;
 
-    // 1. peer.on("open")
     this.peer.on('open', (peerId) => {
       this.fullPeerId = peerId;
       this.reconnectAttempts = 0;
@@ -130,24 +154,10 @@ export class PartySync {
         });
         this.eventBus.emit('TOAST_SHOW', `Host Room Created! Click badge to copy ID.`);
       } else if (role === 'guest' && targetHostId) {
-        console.log(`[PartySync GUEST] Connecting to Host ID: ${targetHostId}`);
-        this.eventBus.emit('PARTY_STATUS_UPDATED', {
-          role: 'guest',
-          peerId: targetHostId,
-          fullPeerId: targetHostId,
-          status: 'Connecting to Host...'
-        });
-
-        try {
-          const conn = this.peer.connect(targetHostId, { reliable: true });
-          this.setupConnectionHandlers(conn);
-        } catch (err) {
-          this.handlePeerError({ type: 'webrtc', message: `Could not initiate connection to ${targetHostId}`, error: err });
-        }
+        this.connectToHost(targetHostId);
       }
     });
 
-    // 2. peer.on("connection") - Incoming Host connections
     this.peer.on('connection', (conn) => {
       console.log(`[PartySync HOST] Incoming connection from Guest: ${conn.peer}`);
       this.setupConnectionHandlers(conn);
@@ -160,45 +170,30 @@ export class PartySync {
       this.eventBus.emit('TOAST_SHOW', 'Remote Party Guest Connected!');
     });
 
-    // 3. peer.on("disconnected") - Signaling socket loss
     this.peer.on('disconnected', () => {
-      console.warn(`[PartySync ${role.toUpperCase()}] Peer Disconnected from signaling server.`);
-      
       if (this.reconnectAttempts < this.maxReconnectAttempts && this.peer && !this.peer.destroyed) {
         this.reconnectAttempts++;
-        console.log(`[PartySync] Attempting signaling server reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-        try {
-          this.peer.reconnect();
-        } catch (err) {
-          console.error('[PartySync] Reconnect attempt failed:', err);
-        }
+        try { this.peer.reconnect(); } catch (err) {}
       } else {
         this.handlePeerError({ type: 'network', message: 'Signaling server connection lost permanently.' });
         this.handleDisconnect('Host Disconnected');
       }
     });
 
-    // 4. peer.on("close") - Peer destroyed
     this.peer.on('close', () => {
-      console.log(`[PartySync ${role.toUpperCase()}] Peer session closed.`);
       this.handleDisconnect('Party Session Closed');
     });
 
-    // 5. peer.on("error") - Peer error dispatcher
     this.peer.on('error', (err) => {
       this.handlePeerError(err);
     });
   }
 
-  /**
-   * Attaches handlers for DataConnection lifecycle events: open, data, close, error
-   * @param {import('peerjs').DataConnection} conn 
-   */
   setupConnectionHandlers(conn) {
     if (!conn) return;
+    this.conn = conn;
     this.activeConnection = conn;
 
-    // 1. connection.on("open")
     conn.on('open', () => {
       console.log(`[PartySync P2P Channel] Open with Peer: ${conn.peer}`);
       if (!this.isHost) {
@@ -212,83 +207,34 @@ export class PartySync {
       }
     });
 
-    // 2. connection.on("data")
-    conn.on('data', (payload) => {
-      this.handleGuestPayload(payload);
+    conn.on('data', (data) => {
+      this.handleGuestPayload(data);
     });
 
-    // 3. connection.on("close")
     conn.on('close', () => {
-      console.log(`[PartySync P2P Channel] Closed with Peer: ${conn.peer}`);
       this.handleDisconnect(this.isHost ? 'Guest Disconnected' : 'Host Disconnected');
     });
 
-    // 4. connection.on("error")
     conn.on('error', (err) => {
-      console.error(`[PartySync P2P Channel Error] Peer: ${conn.peer}`, err);
       this.handlePeerError({ type: 'webrtc', message: 'WebRTC P2P Data Channel Error', error: err });
-      this.handleDisconnect('Party Data Channel Error');
     });
   }
 
-  /**
-   * Maps and handles ALL major PeerJS error codes cleanly
-   * @param {Object} err 
-   */
   handlePeerError(err) {
     const errorType = err ? (err.type || 'unknown') : 'unknown';
-    let readableMessage = 'A WebRTC network error occurred.';
+    let readableMessage = err ? (err.message || 'WebRTC error') : 'WebRTC error';
 
-    switch (errorType) {
-      case 'network':
-        readableMessage = 'Network connection to PeerServer lost or failed.';
-        break;
-      case 'peer-unavailable':
-        readableMessage = 'Host Room ID is invalid, closed, or unavailable.';
-        break;
-      case 'server-error':
-        readableMessage = 'PeerServer encountered an internal error.';
-        break;
-      case 'socket-error':
-        readableMessage = 'WebSocket connection to PeerServer failed.';
-        break;
-      case 'webrtc':
-        readableMessage = 'WebRTC ICE candidate or STUN negotiation failed.';
-        break;
-      case 'browser-incompatible':
-        readableMessage = 'WebRTC Data Channel is incompatible with this browser.';
-        break;
-      case 'ssl-unavailable':
-        readableMessage = 'PeerServer SSL/HTTPS configuration is unavailable.';
-        break;
-      case 'unavailable-id':
-        readableMessage = 'Requested Peer ID is already in use by another session.';
-        break;
-      case 'invalid-id':
-        readableMessage = 'Provided Host Room ID contains invalid characters.';
-        break;
-      default:
-        readableMessage = err.message || 'An unexpected PeerJS networking error occurred.';
-        break;
-    }
-
-    console.error(`[PartySync Network Error] Type: "${errorType}" | Message: ${readableMessage}`, err);
-
-    // 1. Emit EventBus NETWORK_ERROR event
-    this.eventBus.emit('NETWORK_ERROR', {
-      type: errorType,
-      message: readableMessage,
-      error: err
-    });
-
-    // 2. Trigger user Toast notification
+    this.eventBus.emit('NETWORK_ERROR', { type: errorType, message: readableMessage, error: err });
     this.eventBus.emit('TOAST_SHOW', readableMessage);
   }
 
   handleDisconnect(reasonMessage) {
+    this.conn = null;
     this.activeConnection = null;
     this.isHost = false;
     this.fullPeerId = null;
+    this.chunkBuffer = null;
+    this.receivedChunks = 0;
     this.eventBus.emit('PARTY_STATUS_UPDATED', {
       role: 'standalone',
       status: reasonMessage || 'Standalone'
@@ -300,6 +246,7 @@ export class PartySync {
     if (this.activeConnection) {
       try { this.activeConnection.close(); } catch (e) {}
       this.activeConnection = null;
+      this.conn = null;
     }
 
     if (this.peer) {
@@ -309,48 +256,138 @@ export class PartySync {
       } catch (e) {}
       this.peer = null;
     }
+    this.chunkBuffer = null;
+    this.receivedChunks = 0;
   }
 
   broadcastPayload(payload) {
-    if (this.isHost && this.activeConnection && this.activeConnection.open) {
+    const activeConn = this.conn || this.activeConnection;
+    if (this.isHost && activeConn && activeConn.open) {
       try {
-        this.activeConnection.send(payload);
+        activeConn.send(payload);
       } catch (err) {
         this.handlePeerError({ type: 'webrtc', message: 'Failed to broadcast WebRTC payload', error: err });
       }
     }
   }
 
+  // BUG 3 FIX (Part A): Split ArrayBuffer into 16KB chunks
   transferAudioFile(trackObject) {
-    if (!this.activeConnection || !this.activeConnection.open) return;
+    const activeConn = this.conn || this.activeConnection;
+    if (!activeConn || !activeConn.open) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const buffer = reader.result;
-      console.log('[PartySync Host] Sending P2P Audio File Buffer...');
-      this.broadcastPayload({
-        action: 'NEW_TRACK',
-        metadata: {
-          title: trackObject.title,
-          artist: trackObject.artist,
-          album: trackObject.album
-        },
-        fileBuffer: buffer
-      });
+    const file = trackObject ? (trackObject.originalFile || trackObject) : null;
+    if (!file) return;
+
+    const sendBuffer = (arrayBuffer) => {
+      const chunkSize = 16 * 1024; // 16KB limit for max browser compatibility
+      const totalChunks = Math.ceil(arrayBuffer.byteLength / chunkSize);
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      console.log(`[Sonance] Transferring file in ${totalChunks} chunks...`);
+      this.eventBus.emit('TOAST_SHOW', `Streaming audio to Guest (${totalChunks} chunks)...`);
+
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, uint8Array.length);
+        
+        // Slice the Uint8Array and get the underlying ArrayBuffer
+        const chunkBuffer = uint8Array.slice(start, end).buffer;
+
+        this.broadcastPayload({
+          type: 'AUDIO_CHUNK',
+          payload: {
+            chunkIndex: i,
+            totalChunks: totalChunks,
+            data: chunkBuffer
+          }
+        });
+      }
     };
-    reader.onerror = (err) => {
-      this.handlePeerError({ type: 'webrtc', message: 'Failed to read audio file for P2P transfer', error: err });
-    };
-    reader.readAsArrayBuffer(trackObject.originalFile);
+
+    if (file instanceof ArrayBuffer) {
+      sendBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => sendBuffer(reader.result);
+      reader.onerror = (err) => {
+        this.handlePeerError({ type: 'webrtc', message: 'Failed to read audio file for P2P transfer', error: err });
+      };
+      reader.readAsArrayBuffer(file);
+    }
   }
 
-  handleGuestPayload(payload) {
-    if (this.isHost || !payload) return;
+  // BUG 3 FIX (Part B): Reassemble chunks on the guest side
+  handleGuestPayload(message) {
+    if (!message) return;
+
+    // Check if message matches Bug 3 chunking payload structure
+    const type = message.type || message.action;
+    const payload = message.payload || message;
+
+    if (type === 'AUDIO_CHUNK') {
+      // Initialize the buffer array if it doesn't exist
+      if (!this.chunkBuffer) {
+        this.chunkBuffer = [];
+        this.receivedChunks = 0;
+      }
+
+      const { chunkIndex, totalChunks, data, chunk } = payload;
+      const rawChunk = data || chunk;
+      
+      // Store the incoming chunk
+      if (!this.chunkBuffer[chunkIndex]) {
+        this.chunkBuffer[chunkIndex] = new Uint8Array(rawChunk);
+        this.receivedChunks++;
+      }
+
+      // Check if we have received every single chunk
+      if (this.receivedChunks === totalChunks) {
+        console.log('[Sonance] All chunks received. Reassembling file...');
+        
+        // Calculate the exact total byte length
+        const totalLength = this.chunkBuffer.reduce((acc, val) => acc + val.length, 0);
+        const combinedArray = new Uint8Array(totalLength);
+        
+        // Stitch the chunks together sequentially
+        let offset = 0;
+        for (const c of this.chunkBuffer) {
+          combinedArray.set(c, offset);
+          offset += c.length;
+        }
+
+        // Create the final audio Blob
+        const audioBlob = new Blob([combinedArray], { type: 'audio/mpeg' }); 
+        const blobUrl = URL.createObjectURL(audioBlob);
+        
+        // Cleanup memory
+        this.chunkBuffer = null; 
+        this.receivedChunks = 0;
+
+        const remoteTrack = {
+          id: `remote-${Date.now()}`,
+          title: payload.metadata ? payload.metadata.title : 'Remote Party Track',
+          artist: payload.metadata ? payload.metadata.artist : 'Host Audio',
+          album: 'P2P Stream',
+          coverArt: './assets/icons/icon.svg',
+          audioUrl: blobUrl,
+          url: blobUrl
+        };
+
+        // Push to EventBus so audioEngine picks it up
+        this.eventBus.emit('TOAST_SHOW', 'P2P Track Received & Ready');
+        this.eventBus.emit('TRACK_RECEIVED', { url: blobUrl });
+        this.eventBus.emit('CURRENT_TRACK_CHANGED', remoteTrack);
+      }
+      return; // Exit early so we don't process this as a playback sync command
+    }
+
+    if (this.isHost) return;
 
     const now = Date.now();
     const latency = (now - (payload.timestamp || now)) / 1000;
 
-    switch (payload.action) {
+    switch (type) {
       case 'PLAY_ACTION':
         this.eventBus.emit('PLAY_COMMAND');
         break;
@@ -360,21 +397,6 @@ export class PartySync {
       case 'SYNC_TIME': {
         const targetTime = payload.time + Math.max(0, latency);
         this.eventBus.emit('SEEK_COMMAND', targetTime);
-        break;
-      }
-      case 'NEW_TRACK': {
-        this.eventBus.emit('TOAST_SHOW', `Receiving P2P Track: ${payload.metadata.title}`);
-        const blob = new Blob([payload.fileBuffer], { type: 'audio/mp3' });
-        const objectUrl = URL.createObjectURL(blob);
-        const remoteTrack = {
-          id: `remote-${Date.now()}`,
-          title: payload.metadata.title || 'Remote Party Track',
-          artist: payload.metadata.artist || 'Host Audio',
-          album: payload.metadata.album || 'P2P Stream',
-          coverArt: './assets/icons/icon.svg',
-          audioUrl: objectUrl
-        };
-        this.eventBus.emit('CURRENT_TRACK_CHANGED', remoteTrack);
         break;
       }
     }

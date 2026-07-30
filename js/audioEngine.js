@@ -1,13 +1,5 @@
 /**
- * Sonance AudioEngine - Instant Audio Playback Pipeline & Brute-Force Output Routing
- * 
- * Pipeline Chain:
- * HTMLAudioElement (Persistent Class Instance) 
- *  -> MediaElementAudioSourceNode 
- *  -> GainNode (default 1.0) 
- *  -> 5 BiquadFilterNodes (60Hz, 250Hz, 1kHz, 4kHz, 12kHz) 
- *  -> AnalyserNode 
- *  -> AudioContext.destination (Speakers)
+ * Sonance AudioEngine - Audio Playback Pipeline & Web Audio Graph
  */
 export class AudioEngine {
   /**
@@ -63,7 +55,6 @@ export class AudioEngine {
       this.waveformWorker = new Worker(new URL('./waveformWorker.js', import.meta.url));
       this.waveformWorker.onmessage = (e) => {
         const peaksArray = e.data;
-        console.log('[Waveform Debug] Background Web Worker Peak Data Received:', peaksArray ? peaksArray.length : 0);
         this.eventBus.emit('WAVEFORM_DATA_READY', peaksArray);
       };
       this.waveformWorker.onerror = (err) => {
@@ -162,6 +153,10 @@ export class AudioEngine {
       this.loadAndPlayTrack(trackObject);
     });
 
+    this.eventBus.on('TRACK_RECEIVED', ({ url }) => {
+      this.loadAndPlayTrack(url);
+    });
+
     this.eventBus.on('PLAY_COMMAND', () => this.play());
     this.eventBus.on('PAUSE_COMMAND', () => this.pause());
     this.eventBus.on('SEEK_COMMAND', (time) => this.seek(time));
@@ -174,20 +169,49 @@ export class AudioEngine {
   }
 
   setTrackSourceOnly(trackObject) {
-    if (!trackObject || !trackObject.audioUrl) return;
-    this.currentTrack = trackObject;
-    this.audioElement.src = trackObject.audioUrl;
+    if (!trackObject) return;
+    const blobUrl = typeof trackObject === 'string' ? trackObject : (trackObject.audioUrl || trackObject.url);
+    if (!blobUrl) return;
+
+    if (typeof trackObject === 'object') {
+      this.currentTrack = trackObject;
+    }
+    this.audioElement.src = blobUrl;
+    this.audioElement.load();
   }
 
-  async loadAndPlayTrack(trackObject) {
-    if (!trackObject || !trackObject.audioUrl) return;
-    this.currentTrack = trackObject;
-    console.log(`[Sonance Debug] Loading Track: "${trackObject.title}"`);
-    
-    this.audioElement.src = trackObject.audioUrl;
-    this.play();
+  // BUG 2 FIX: Await 'canplay' before triggering playback
+  async loadAndPlayTrack(blobUrlInput) {
+    if (!blobUrlInput) return;
+    try {
+      const blobUrl = typeof blobUrlInput === 'string' ? blobUrlInput : (blobUrlInput.audioUrl || blobUrlInput.url);
+      if (!blobUrl) return;
 
-    this.generateWaveform(trackObject.originalFile);
+      if (typeof blobUrlInput === 'object') {
+        this.currentTrack = blobUrlInput;
+      }
+
+      this.audioElement.src = blobUrl;
+      
+      // Force the browser to begin fetching and decoding the blob data
+      this.audioElement.load();
+
+      // Halt execution until the browser guarantees the media is ready
+      await new Promise((resolve) => {
+        this.audioElement.addEventListener('canplay', resolve, { once: true });
+      });
+
+      console.log('[Sonance] Media successfully decoded. Initiating playback...');
+      
+      // Now safely trigger playback
+      await this.play();
+      
+      if (typeof blobUrlInput === 'object' && blobUrlInput.originalFile) {
+        this.generateWaveform(blobUrlInput.originalFile);
+      }
+    } catch (error) {
+      console.error('[Sonance] Error loading track:', error);
+    }
   }
 
   async generateWaveform(file) {
@@ -217,9 +241,6 @@ export class AudioEngine {
     }
   }
 
-  /**
-   * Brute-forces AudioContext wake and GainNode output levels before playback
-   */
   async play() {
     try {
       if (this.audioCtx && this.audioCtx.state !== 'running') {
@@ -227,7 +248,6 @@ export class AudioEngine {
         await this.audioCtx.resume();
       }
       
-      // Brute-force hardware and virtual volumes to prevent 0-gain silence traps
       this.audioElement.volume = 1.0;
       if (this.gainNode && this.audioCtx) {
         this.gainNode.gain.setTargetAtTime(1.0, this.audioCtx.currentTime, 0.01);
