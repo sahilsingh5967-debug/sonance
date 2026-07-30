@@ -15,13 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize central EventBus
   const eventBus = new EventBus();
 
-  // Instantiate Modules
-  const storage = new Storage(eventBus);
-  const audioEngine = new AudioEngine(eventBus);
-  const uiController = new UIController(eventBus);
-  const visualizer = new Visualizer(eventBus);
-  const partySync = new PartySync(eventBus);
-  const playlist = new Playlist(eventBus);
+  // Instantiate Subsystems into Application Container
+  const app = {
+    eventBus,
+    storage: new Storage(eventBus),
+    audioEngine: new AudioEngine(eventBus),
+    uiController: new UIController(eventBus),
+    visualizer: new Visualizer(eventBus),
+    partySync: new PartySync(eventBus),
+    playlist: new Playlist(eventBus)
+  };
 
   // Apple / Safari / macOS Physical DOM Interaction Audio Unlocker
   const unlock = () => {
@@ -41,5 +44,5 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => console.warn('⚠️ [Sonance PWA] ServiceWorker Registration Failed:', err));
   }
 
-  console.log('✅ [SONANCE HI-FI ENGINE] All Modules & State Restored.');
+  console.log('✅ [SONANCE HI-FI ENGINE] All Subsystems & Application State Active:', app);
 });

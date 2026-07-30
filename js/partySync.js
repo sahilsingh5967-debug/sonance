@@ -357,11 +357,12 @@ export class PartySync {
       case 'PAUSE_ACTION':
         this.eventBus.emit('PAUSE_COMMAND');
         break;
-      case 'SYNC_TIME':
+      case 'SYNC_TIME': {
         const targetTime = payload.time + Math.max(0, latency);
         this.eventBus.emit('SEEK_COMMAND', targetTime);
         break;
-      case 'NEW_TRACK':
+      }
+      case 'NEW_TRACK': {
         this.eventBus.emit('TOAST_SHOW', `Receiving P2P Track: ${payload.metadata.title}`);
         const blob = new Blob([payload.fileBuffer], { type: 'audio/mp3' });
         const objectUrl = URL.createObjectURL(blob);
@@ -375,6 +376,7 @@ export class PartySync {
         };
         this.eventBus.emit('CURRENT_TRACK_CHANGED', remoteTrack);
         break;
+      }
     }
   }
 

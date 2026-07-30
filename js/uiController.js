@@ -335,11 +335,12 @@ export class UIController {
 
   executeCommand(cmd) {
     switch (cmd) {
-      case 'toggle-play':
+      case 'toggle-play': {
         if (this.partyRole === 'guest') return;
         const isPlaying = this.vinylContainer.classList.contains('spinning');
         this.eventBus.emit(isPlaying ? 'PAUSE_COMMAND' : 'PLAY_COMMAND');
         break;
+      }
       case 'next':
         if (this.partyRole === 'guest') return;
         this.eventBus.emit('NEXT_TRACK_COMMAND');
