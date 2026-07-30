@@ -1,7 +1,7 @@
 # 🎵 Sonance — Hi-Fi Music Player & WebRTC Remote Party
 
 [![CI Pipeline](https://github.com/sahilsingh5967-debug/sonance/actions/workflows/ci.yml/badge.svg)](https://github.com/sahilsingh5967-debug/sonance/actions/workflows/ci.yml)
-[![Vercel](https://img.shields.io/badge/Vercel-Live-000000?logo=vercel&logoColor=white)](https://sonance.vercel.app)
+[![Vercel](https://img.shields.io/badge/Vercel-Live-000000?logo=vercel&logoColor=white)](https://sonance-livid.vercel.app)
 
 > A high-performance Progressive Web Application built with **pure Vanilla JS (ES6 Modules)**, Web Audio API 5-Band DSP, Web Workers, Canvas Visualizers, and serverless WebRTC P2P audio streaming — zero frameworks, zero dependencies on runtime libraries.
 
