@@ -1,7 +1,6 @@
 /**
- * Sonance - Automated Unit Test Suite (Empty Queue & File Ingestion)
+ * Sonance Test Suite - Playlist State Unit Tests
  */
-
 import { EventBus } from '../js/eventBus.js';
 
 let passed = 0;
@@ -18,23 +17,25 @@ function assert(condition, message) {
 }
 
 console.log('\n==================================================');
-console.log('⚡ SONANCE ENGINE - EMPTY QUEUE & INGESTION SUITE');
+console.log('⚡ SONANCE ENGINE - PLAYLIST SUITE');
 console.log('==================================================\n');
 
-const eventBus = new EventBus();
+const bus = new EventBus();
 
 // Test 1: QUEUE_UPDATED Empty State Emission
 let queueData = null;
-eventBus.on('QUEUE_UPDATED', (queue) => { queueData = queue; });
-eventBus.emit('QUEUE_UPDATED', []);
-assert(Array.isArray(queueData) && queueData.length === 0, 'Test 1 (QUEUE_UPDATED Empty State): Queue initializes as pure empty array');
+bus.on('QUEUE_UPDATED', (q) => { queueData = q; });
+bus.emit('QUEUE_UPDATED', []);
+assert(Array.isArray(queueData) && queueData.length === 0, 'Test 1 (Playlist Queue State): Queue state initializes as empty array');
+
+// Test 2: TRACK_SELECTED Event Dispatching
+let selectedTrackId = null;
+bus.on('TRACK_SELECTED', (id) => { selectedTrackId = id; });
+bus.emit('TRACK_SELECTED', 'track-123');
+assert(selectedTrackId === 'track-123', 'Test 2 (Track Selection): TRACK_SELECTED event dispatched with track ID');
 
 console.log('\n--------------------------------------------------');
 console.log(`TEST SUMMARY: ${passed} Passed, ${failed} Failed`);
 console.log('--------------------------------------------------\n');
 
-if (failed > 0) {
-  process.exit(1);
-} else {
-  process.exit(0);
-}
+if (failed > 0) process.exit(1);

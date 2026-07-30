@@ -1,124 +1,91 @@
-# ⚡ SONANCE
+# 🎵 SONANCE — Luxury Hi-Fi Music Player & WebRTC Remote Party PWA
 
-### Luxury Hi-Fi Music Player & WebRTC Remote Party PWA
+> **A recruiter-grade, high-performance Progressive Web Application built with pure Vanilla JS (ES6), Web Audio API 5-Band DSP, Web Workers, Canvas Visualizers, and Serverless WebRTC PeerJS Audio Streaming.**
 
-An elegant Progressive Web Application emulating Bang & Olufsen hi-fi acoustics, featuring an Event-Driven Pub/Sub architecture, 5-band Web Audio EQ with 7 one-click presets, 60FPS multi-mode Canvas visualizer, VS Code style Command Palette (`Ctrl + Shift + P`), offline PWA capabilities, and serverless WebRTC Remote Party synchronization via PeerJS.
-
-🌐 **Live Demo:** [https://sonance-hifi.vercel.app](https://sonance-hifi.vercel.app)
+![Sonance Cover](./assets/icons/icon.svg)
 
 ---
 
-![Sonance Preview](./assets/icons/icon.svg)
+## 🌟 Key Features
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?logo=javascript&logoColor=black)
-![WebRTC](https://img.shields.io/badge/WebRTC-PeerJS-red)
-![PWA](https://img.shields.io/badge/PWA-Ready-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Vercel](https://img.shields.io/badge/Deployed-Vercel-black)
-
----
-
-## ✨ Features
-
-- **Bang & Olufsen Inspired Chassis** — Matte Black & Champagne Bronze materials, vinyl disc rotation animations, and OLED glass display.
-- **Data Persistence State Engine (`storage.js`)** — Automatically saves and restores Volume and 5-Band EQ settings across sessions via `localStorage`.
-- **VS Code Style Command Palette (`Ctrl + Shift + P`)** — Keyboard-first modal triggering playback, theme, visualizer modes, and EQ presets.
-- **Dynamic Album-Art Background Blur** — Real-time backdrop blur filter (`backdrop-filter: blur(90px)`) driven dynamically by current track cover art.
-- **3 Visualizer Modes** — Hot-swappable 60FPS Canvas renderers: *Frequency Spectrum*, *Waveform Oscilloscope*, and *Circular Radial Pulse*.
-- **5-Band Equalizer & 7 Presets** — `SourceNode -> GainNode -> 5 BiquadFilters -> AnalyserNode -> Speakers` with 1-click presets (*Flat*, *Rock*, *Pop*, *Jazz*, *Bass Boost*, *Electronic*, *Speech*).
-- **Serverless WebRTC Remote Party Sync** — Real-time P2P playback state & latency compensation across devices using PeerJS.
-- **ID3 Metadata Extraction (`jsmediatags`)** — Extracts ID3 tags and converts raw cover art byte arrays to Base64 image URLs.
-- **Progressive Web App (PWA)** — 100% offline capability powered by Service Worker (`sw.js`).
+- **⚡ Zero Framework Architecture**: Built strictly with ES6 JavaScript Modules and a custom Pub/Sub `EventBus` design pattern for decoupled event management.
+- **🎛️ Web Audio API 5-Band Equalizer DSP**: Real-time parametric BiquadFilter equalizer (`60Hz`, `250Hz`, `1kHz`, `4kHz`, `12kHz`) with instant presets (`Bass Boost`, `Rock`, `Pop`, `Jazz`, `Electronic`, `Speech`).
+- **📊 60FPS Canvas Visualizer Deck**: Real-time spectrum analysis, oscilloscope waveform rendering, and circular radial visualizer driven by `AnalyserNode` and `requestAnimationFrame`.
+- **📈 SoundCloud-Style Waveform Scrubber**: Asynchronous background peak extraction powered by a **Web Worker** and **Transferable Objects**, rendering interactive peak canvases without main thread UI freezing.
+- **🌐 Serverless WebRTC Remote Party**: P2P state synchronization and raw `ArrayBuffer` MP3 audio file streaming across host and guest sessions using WebRTC and PeerJS.
+- **📱 Progressive Web Application (PWA)**: Complete offline caching strategy via Service Worker (`sw.js`) and web app installation manifest (`manifest.json`).
+- **🎨 Dynamic Palette Extraction**: Adaptive background aura dynamically extracted from album cover art using `ColorThief`.
+- **🔒 macOS & Safari Compatibility**: Automatic Web Audio Context unblocking on physical user interaction, robust gain ramping anchors, and CORS-safe blob handling.
 
 ---
 
-## ⌨️ Desktop Keyboard Shortcuts Matrix
-
-| Shortcut | Action | Description |
-| :--- | :--- | :--- |
-| `Space` | Play / Pause | Toggle audio playback & vinyl disc spin |
-| `←` / `→` | Seek -/+ 5s | Scrub audio timeline |
-| `Ctrl + ←` / `Ctrl + →` | Previous / Next | Skip track queue |
-| `M` | Mute | Toggle volume mute |
-| `Ctrl + Shift + P` | Command Palette | Open VS Code style command modal |
-| `Esc` | Close | Dismiss overlays & modals |
-
----
-
-## 🏗 Architecture Pattern (Pub/Sub Event Bus)
-
-No module communicates directly with another. Every interaction passes through `eventBus.js`:
+## 🔊 Audio Routing Architecture
 
 ```
-User Action -> UIController -> EventBus.emit('PLAY_COMMAND') -> AudioEngine.play()
-                                                            -> Visualizer.startLoop()
-                                                            -> PartySync.broadcast()
+[ HTMLAudioElement ]
+        │
+        ▼
+[ MediaElementAudioSourceNode ]
+        │
+        ▼
+[ GainNode (Volume Ramping & Mute) ]
+        │
+        ▼
+[ 5x BiquadFilterNodes ] (60Hz -> 250Hz -> 1kHz -> 4kHz -> 12kHz)
+        │
+        ▼
+[ AnalyserNode (FFT Size: 256) ]
+        │
+        ▼
+[ AudioContext.destination ] (Physical Speakers)
 ```
 
 ---
 
-## 🛠 Tech Stack
+## 🛠️ Technology Stack
 
-- **HTML5 & CSS3** — CSS Custom Properties, glassmorphism, 3D CSS transforms
-- **JavaScript (ES6)** — Event-driven modular architecture (`eventBus.js`, `audioEngine.js`, `uiController.js`, `visualizer.js`, `partySync.js`, `playlist.js`, `storage.js`)
-- **Web Audio API** — 5-band Equalizer graph & Audio Analyser
-- **WebRTC / PeerJS** — Serverless P2P data channels for Remote Party listening
-- **Canvas API** — 60FPS multi-mode spectrum visualizer
-- **Service Worker & Manifest** — Offline PWA support
-- **Vercel** — Production deployment configuration
-
----
-
-## 📂 Project Structure
-
-```
-MusicPlayer/
-├── index.html            # Sonance Luxury Hi-Fi Grid & Command Palette Modal
-├── manifest.json         # PWA Web App Manifest
-├── sw.js                 # Service Worker (offline cache engine)
-├── vercel.json           # Vercel production headers
-├── css/
-│   ├── design-system.css # Design system tokens & materials
-│   ├── layout.css        # Hi-Fi Chassis grid structure & fade-in startup
-│   ├── components.css    # OLED display, Command Palette, Toast & visualizer
-│   └── responsive.css    # Mobile & tablet adapters
-├── js/
-│   ├── main.js           # Bootstrapper, storage restore & PWA ServiceWorker
-│   ├── eventBus.js       # Pub/Sub State Manager (.on, .emit, .off)
-│   ├── audioEngine.js    # Web Audio Graph, 5-band EQ & Presets
-│   ├── uiController.js   # DOM Manipulator, Shortcuts & Command Palette
-│   ├── visualizer.js     # 60FPS Multi-Mode Canvas Visualizer
-│   ├── partySync.js      # PeerJS WebRTC P2P remote party sync
-│   ├── playlist.js       # Data Ingestion, ID3 Tags & queue manager
-│   └── storage.js        # LocalStorage state persistence
-├── test/
-│   └── Auralis.test.js   # Automated unit test suite
-└── README.md             # Open-source recruiter-grade documentation
-```
+- **Core Engine**: HTML5, Vanilla CSS3 (Custom Design System), ES6 JavaScript Modules
+- **Audio Processing**: Web Audio API (`AudioContext`, `BiquadFilterNode`, `GainNode`, `AnalyserNode`)
+- **Multithreading**: Web Workers API (`waveformWorker.js` with `Float32Array` Transferable Objects)
+- **Visuals**: HTML5 Canvas 2D API & ColorThief
+- **P2P Networking**: WebRTC API & PeerJS
+- **Progressive Web App**: Service Workers & Cache API
 
 ---
 
-## 🚀 Getting Started
+## 🚀 How to Run Locally
+
+Because Sonance uses ES6 JavaScript modules, Web Workers, and Service Workers, it requires a local HTTP server to bypass browser CORS security policies.
+
+### Option 1: Python HTTP Server (Built-in)
+```bash
+# Navigate to the project root
+cd /path/to/MusicPlayer
+
+# Launch Python 3 local server
+python3 -m http.server 8000
+```
+Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in Google Chrome, Safari, or Microsoft Edge.
+
+### Option 2: VS Code Live Server
+1. Install the **Live Server** extension in VS Code.
+2. Right-click `index.html` and select **Open with Live Server**.
+
+---
+
+## 🌐 Deploying to Vercel
+
+Sonance is pre-configured for instant Vercel deployment with clean URLs and immutable static asset headers via `vercel.json`:
 
 ```bash
-# Clone the repository
-git clone https://github.com/shahilraj/sonance.git
-
-# Navigate into project directory
-cd sonance
-
-# Run unit tests
-npm test
+npm i -g vercel
+vercel --prod
 ```
 
 ---
 
-## 📜 License
+## 👨‍💻 Developer & Project Credits
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
-
----
-
-<p align="center">Made with ❤️ by Shahil Raj</p>
+- **Developer**: [Shahil Raj](https://github.com/shahilraj)
+- **Organization**: CodeAlpha Frontend Development Internship
+- **License**: MIT
