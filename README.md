@@ -5,7 +5,7 @@
 
 > A high-performance Progressive Web Application built with **pure Vanilla JS (ES6 Modules)**, Web Audio API 5-Band DSP, Web Workers, Canvas Visualizers, and serverless WebRTC P2P audio streaming — zero frameworks, zero dependencies on runtime libraries.
 
-![Sonance UI](./assets/sonance-preview.png)
+![Sonance UI](assets/screenshots/sonance-preview.png)
 
 ---
 
